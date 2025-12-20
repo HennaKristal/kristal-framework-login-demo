@@ -1,0 +1,141 @@
+# ====================================== #
+# Rewrite Engine and Basic Configuration #
+# ====================================== #
+RewriteEngine On
+RewriteBase / 
+
+
+# ========================== #
+# Disable Directory Indexing #
+# ========================== #
+Options -Indexes
+
+
+# ======================= #
+# Force HTTPS Connections #
+# ======================= #
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+
+# ========================================= #
+# Normalize URLs by Adding Trailing Slashes #
+# ========================================= #
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_URI} !^/$
+RewriteCond %{REQUEST_URI} !(.+)/$
+RewriteRule ^(.+)$ /$1/ [R=301,L]
+
+
+# =============== #
+# Routing Control #
+# =============== #
+RewriteRule ^index\.php$ - [L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule . index.php [L,QSA]
+
+
+# =================================== #
+# Protect Sensitive Server Side Files #
+# =================================== #
+# Block dangerous and sensitive file extensions
+<FilesMatch "\.(env|ini|sql|db|sqlite|sqlite3|old|backup|bak|bk|tmp|swp|yml|svn|yaml|lock|log)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+# Block specific files
+<FilesMatch "^(composer\.json|README\.md|license\.txt|\.gitignore)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
+
+
+# ================================ #
+# Hide Development Related Folders #
+# ================================ #
+RedirectMatch 404 ^/\.git(/|$)
+RedirectMatch 404 ^/\.vscode(/|$)
+RedirectMatch 404 ^/\.vs(/|$)
+RedirectMatch 404 ^/\.idea(/|$)
+RedirectMatch 404 ^/\.svn(/|$)
+
+
+# ===================== #
+# Security HTTP Headers #
+# ===================== #
+<IfModule mod_headers.c>
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+    Header always set X-XSS-Protection "0"
+
+    # Enable HSTS when ready for permanent HTTPS usage
+    # Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+
+    # Prevent your site from appearing inside iframes
+    # Header always set X-Frame-Options "SAMEORIGIN"
+
+    # Restrict all resource loading to your own domain
+    # Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; object-src 'none';"
+</IfModule>
+
+
+# ======= #
+# Caching #
+# ======= #
+FileETag None
+
+<IfModule mod_headers.c>
+    # Enable cache for images, CSS, JavaScript, and web fonts (7884000 = 3 months)
+    <FilesMatch "\.(jpg|jpeg|png|gif|webp|svg|ico|css|js|map|json|woff|woff2|ttf|otf|wav|mp3|mp4|webm|mov)$">
+        Header set Cache-Control "max-age=7884000, public"
+    </FilesMatch>
+    # Disable cache for dynamic content
+    <FilesMatch "\.(php|cgi|pl|htm|html)$">
+        Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+        Header set Pragma "no-cache"
+        Header set Expires "0"
+    </FilesMatch>
+</IfModule>
+
+
+# =========== #
+# Compression #
+# =========== #
+<IfModule mod_brotli.c>
+    AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/css text/javascript application/javascript application/json application/xml application/xhtml+xml
+</IfModule>
+
+<IfModule mod_deflate.c>
+    <IfModule !mod_brotli.c>
+        AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json application/xml application/xhtml+xml
+    </IfModule>
+</IfModule>
+
+
+# ============== #
+# Authentication #
+# ============== #
+# AuthType Basic
+# AuthName "Restricted Access"
+# AuthUserFile /PATH_TO_YOUR_WEBSITE/.htpasswd
+# Require valid-user
+
+
+# ============ #
+# PHP Settings #
+# ============ #
+# php_value upload_max_filesize 32M
+# php_value post_max_size 32M

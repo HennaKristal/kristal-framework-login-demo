@@ -1,0 +1,98 @@
+body {
+
+    font-family: $text_font_family;
+    color: $text_color;
+    font-size: $default_font_size;
+    line-height: 1.85;
+
+
+    h1 {
+        font-family: $title_font_family;
+        color: $title_color;
+        font-size: 2.45rem;
+        font-weight: 700;
+        line-height: 1.35;
+        margin-bottom: 16px;
+    }
+
+    h2 {
+        font-family: $title_font_family;
+        color: $title_color;
+        font-size: 1.96rem;
+        line-height: 1.35;
+        margin-bottom: 16px;
+    }
+
+    h3 {
+        font-family: $title_font_family;
+        color: $title_color;
+        font-size: 1.57rem;
+        line-height: 1.35;
+        margin-bottom: 16px;
+    }
+
+    h4 {
+        font-family: $title_font_family;
+        color: $title_color;
+        font-size: 1.25rem;
+        line-height: 1.35;
+        margin-bottom: 16px;
+    }
+
+    h5 {
+        font-family: $title_font_family;
+        color: $title_color;
+        font-size: 1.25rem;
+        line-height: 1.35;
+        margin-bottom: 16px;
+    }
+
+    h6 {
+        font-family: $title_font_family;
+        color: $title_color;
+        font-size: 1.25rem;
+        line-height: 1.35;
+        margin-bottom: 16px;
+    }
+
+    p {
+        color: $text-color;
+        font-size: 1rem;
+    }
+
+    label {
+        color: $text-color;
+        font-size: 1rem;
+    }
+
+    .form-label {
+        color: $text-color;
+        font-size: 1rem; 
+    }
+
+    span {
+        color: $text-color;
+        font-size: 1rem;
+    }
+
+    small {
+        color: $text-color;
+        font-size: 0.8rem;
+    }
+
+    ul li {
+        font-size: 1rem;
+    }
+
+    a {
+        color: $link_color;
+        font-size: 1rem;
+        transition: color 0.2s ease-in-out;
+        cursor: pointer;
+
+        &:hover {
+            color: $link_hover_color;
+            text-decoration: none;
+        }
+    }
+}

@@ -1,0 +1,21 @@
+.form-card {
+    background-color: $navbar_backgorund_color;
+    border: 1px solid $navbar_border_color;
+    border-radius: 12px;
+    padding: 25px;
+
+    .form-control {
+        padding: 10px 12px;
+        border: 1px solid $form_input_border_color;
+        background: $form_input_background_color;
+        color: $form_input_color;
+        border-radius: 4px;
+        transition: border-color 0.2s, box-shadow 0.2s;
+
+        &:focus {
+            outline: none;
+            border-color: $accent_color;
+            box-shadow: 0 0 0 2px $accent_color_dark;
+        }
+    }
+}

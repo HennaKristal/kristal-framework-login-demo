@@ -1,0 +1,68 @@
+.account-page {
+    margin-top: 60px;
+    margin-bottom: 60px;
+
+    /* Section layout */
+    .settings-section {
+        margin-bottom: 60px;
+    }
+
+    /* Headings */
+    .section-title {
+        margin-bottom: 10px;
+    }
+
+    .section-subtitle {
+        margin-bottom: 30px;
+        color: $subtext_color;
+    }
+
+    /* Cards */
+    .settings-card {
+        margin-top: 20px;
+        padding: 0;
+    }
+
+    .settings-card .card-body {
+        padding: 25px;
+    }
+
+    /* Form spacing */
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    /* Feedback */
+    .feedback {
+        margin-top: 10px;
+        margin-bottom: 15px;
+    }
+
+    // Avatar
+    #avatar {
+        border-radius: 4px 0px 0px 4px;
+    }
+    #clear-avatar-button {
+        width: 150px;
+        height: 46px;
+        border-radius: 0px 6px 6px 0px;
+    }
+
+    /* Danger Zone */
+    .danger-zone {
+        padding-top: 20px;
+        
+        .danger-card {
+            border: 1px solid $error-color-shade;;
+            background: #1c0f0f;
+        }
+    
+        .danger-card .settings-subheading {
+            margin-bottom: 10px;
+        }
+    
+        .danger-text {
+            margin-bottom: 20px;
+        }
+    }
+}

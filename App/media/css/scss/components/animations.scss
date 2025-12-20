@@ -1,0 +1,90 @@
+.animation-raise {
+    transform: translate3d(0, 10vw, 0);
+    opacity: 0;
+    transition: transform 1000ms ease, opacity 2500ms ease !important;
+}
+.animation-raise.animated {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+}
+
+
+.animation-fade {
+    opacity: 0;
+    transition: opacity 2500ms ease !important;
+}
+.animation-fade.animated {
+    opacity: 1;
+}
+
+
+.animation-scale {
+    transform: scale(0.5);
+    transition: transform 1000ms ease-in-out !important;
+}
+.animation-scale.animated {
+    transform: scale(1);
+}
+
+
+.animation-move-left {
+    transform: translate3d(-10vw, 0, 0);
+    opacity: 0;
+    transition: transform 2500ms ease, opacity 2500ms ease !important;
+}
+.animation-move-left.animated {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+}
+
+
+.animation-move-right {
+    transform: translate3d(10vw, 0, 0);
+    opacity: 0;
+    transition: transform 2500ms ease, opacity 2500ms ease !important;
+}
+.animation-move-right.animated {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+}
+
+
+.animation-move-up {
+    transform: translate3d(0, 7vw, 0);
+    opacity: 0;
+    transition: transform 2500ms ease, opacity 2500ms ease !important;
+}
+.animation-move-up.animated {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+}
+
+
+.animation-move-down {
+    transform: translate3d(0, -7vw, 0);
+    opacity: 0;
+    transition: transform 2500ms ease, opacity 2500ms ease !important;
+}
+.animation-move-down.animated {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+}
+
+
+.colorized {
+    animation: hue-rotation 5s infinite linear;
+}
+.colorized-fast {
+    animation: hue-rotation 3s infinite linear;
+}
+.colorized-slow {
+    animation: hue-rotation 8s infinite linear;
+}
+@keyframes hue-rotation {
+    0% {
+        filter: hue-rotate(0deg);
+    }
+    100% {
+        filter: hue-rotate(360deg);
+    }
+}

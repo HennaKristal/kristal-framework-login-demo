@@ -1,0 +1,40 @@
+
+.show-mobile,
+.show-tablet,
+.show-laptop,
+.show-tabletop {
+    display: none;
+}
+
+@media only screen and (max-width: 1599px) {
+    .hide-tabletop { display: none !important; }
+    .show-tabletop { display: inline-block; }
+}
+
+@media only screen and (max-width: 1199px) {
+    .hide-laptop { display: none !important; }
+    .show-laptop { display: inline-block; }
+}
+
+@media only screen and (max-width: 991px) {
+    .hide-tablet { display: none !important; }
+    .show-tablet { display: inline-block; }
+}
+
+@media only screen and (max-width: 767px) {
+    .hide-mobile { display: none !important; }
+    .show-mobile { display: inline-block; }
+}
+
+
+.text-center {
+    text-align: center !important;
+}
+
+.text-left {
+    text-align: left !important;
+}
+
+.text-right {
+    text-align: right !important;
+}

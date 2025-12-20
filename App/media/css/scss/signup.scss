@@ -1,0 +1,117 @@
+/* Custom body background for create account page */
+body.signup-gradient {
+    background-color: $background_color_light;
+}
+@media (min-width: 1200px) {
+    body.signup-gradient {
+        background: linear-gradient(to right, $background_color 0%, $background_color 50%, $background_color_light 50%, $background_color_light 100%);;
+    }
+}
+
+
+.create-account-page {
+    width: 100%;
+    min-height: 100vh;
+
+    .signup-marketing-container {
+        padding: 64px 0;
+        background-color: $background_color;
+        min-height: 100vh;
+        margin-bottom: 0px !important;
+
+        /* Titles */
+        .signup-title {
+        }
+    
+        .signup-subtitle {
+            color: $subtitle_color;
+            margin-bottom: 32px;
+        }
+
+        /* Features */
+        .signup-features {
+
+        }
+        
+        .signup-feature {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: $text_color;
+            padding-bottom: 20px;
+        }
+        
+        .signup-icon {
+            width: 40px;
+            height: 40px;
+        }
+    }
+    
+    .signup-form-container {
+        padding: 60px 0;
+        background-color: $background_color_light;
+        min-height: 100vh;
+        margin-bottom: 0px !important;
+
+        /* Form */
+        .signup-form-card {
+            width: 90%;
+            max-width: 520px;
+            
+            #registration-button {
+                margin-top: 32px;
+            }
+
+            .already-have-account-label {
+                margin-top: 20px;
+            }
+        }
+    }
+    
+    
+    /* Terms of service */
+    .tos-popup {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.85);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 5000;
+    }
+    
+    .tos-popup-content {
+        padding: 40px;
+        background: $background_color;
+        width: 600px;
+        max-width: 90%;
+    }
+    
+    .tos-text {
+        color: $text_color;
+    }
+}
+
+
+
+/* account activation page */
+.activate-account-page {
+
+    margin-top: 60px;
+    margin-bottom: 60px;
+
+    h1 {
+        margin-top: 0;
+    }
+    
+    h2{
+        margin-top: 60px;
+    }
+
+    .link-btn {
+        margin-top: 32px;
+    }
+}

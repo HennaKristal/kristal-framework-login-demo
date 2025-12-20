@@ -1,0 +1,5 @@
+$(document).ready(function(){const emailInput=$("#login-email");const passwordInput=$("#login-password");const rememberCheckbox=$("#login-remember-email");const savedEmail=localStorage.getItem("rememberedEmail");const savedRemember=localStorage.getItem("rememberRememberMe");let emailWasRestored=false;if(savedRemember==="true"){rememberCheckbox.prop("checked",true);if(savedEmail){emailInput.val(savedEmail);emailWasRestored=true;}}
+if(emailWasRestored){passwordInput.trigger("focus");}else{emailInput.trigger("focus");}
+rememberCheckbox.on("change",function(){if($(this).is(":checked")){localStorage.setItem("rememberRememberMe","true");localStorage.setItem("rememberedEmail",emailInput.val().trim());}else{localStorage.setItem("rememberRememberMe","false");localStorage.removeItem("rememberedEmail");}});emailInput.on("input",function(){if(rememberCheckbox.is(":checked")){localStorage.setItem("rememberedEmail",$(this).val().trim());}});});
+/* Generated: 12.12.2025 20:45:48 */
+//# sourceMappingURL=login.js.map

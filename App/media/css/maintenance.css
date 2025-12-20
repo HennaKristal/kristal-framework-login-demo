@@ -1,0 +1,178 @@
+/* General */
+body {
+    font-family: Helvetica, Arial, sans-serif;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    background-color: #0d0b0d;
+}
+
+@media only screen and (max-width: 800px) {
+    body {
+        background-color: #0d0b0d;
+        background-attachment: local;
+        background-position: top;
+    }
+}
+
+.center {
+    text-align: center;
+}
+
+
+
+
+
+/* Fonts */
+h1 {
+    font-size: 60px;
+    font-weight: bold;
+}
+
+@media only screen and (max-width: 600px) {
+    h1 {
+        font-size: 40px;
+    }
+}
+
+a {
+    text-decoration: none;
+}
+
+
+
+
+
+/* Languages */
+#language-selection {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+#language-selection label {
+    color: gray;
+    font-weight: bold;
+    cursor: pointer;
+    padding-left: 10px;
+}
+
+#language-selection label.active {
+    color: black;
+}
+
+#language-selection .change-language {
+    width: 50px;
+    padding: 10px;
+    cursor: pointer;
+    filter: brightness(66%);
+    transition: filter 0.2s ease-in-out;
+}
+
+#language-selection .change-language:hover {
+    filter: brightness(80%);
+}
+
+#language-selection .change-language.active {
+    filter: brightness(100%);
+}
+
+
+
+
+
+/* Content */
+.maintenance-title {
+    padding-top: 100px;
+    text-align: center;
+}
+
+.maintenance-text {
+    width: 60%;
+    padding: 30px;
+    text-align: center;
+}
+
+@media only screen and (max-width: 600px) {
+    .maintenance-text {
+        width: 100%;
+    }
+}
+
+
+
+
+
+/* Social Icons */
+.social-icons {
+    position: fixed;
+    bottom: 10px;
+    right: 50px;
+    text-align: center;
+}
+
+.social-menu-image {
+    width: 50px;
+    height: 50px;
+}
+
+.social-menu-link {
+    filter: brightness(66%);
+    transition: filter 0.2s ease-in-out;
+}
+
+.social-menu-link:hover {
+    filter: brightness(100%);
+}
+
+@media only screen and (max-width: 800px) {
+    .social-icons {
+        position: relative;
+        right: 0px;
+        width: 100%;
+    }
+}
+
+
+
+
+
+/* Authentication Form */
+.authentication-container {
+    padding-top: 50px;
+    color: white;
+    text-align: center;
+}
+
+@media only screen and (min-width: 800px) {
+    .authentication-container {
+        width: 60%;
+        margin-left: 20%;
+    }
+}
+
+@media only screen and (min-width: 1500px) {
+    .authentication-container {
+        color: white;
+        position: absolute;
+        bottom: 0px;
+        left: 0px;
+        width: 40%;
+        margin-left: 30%;
+    }
+}
+
+.authentication-container form {
+    padding: 20px;
+}
+
+.authentication-container form button {
+    margin-top: 20px;
+    padding: 10px 30px 10px 30px !important;
+    font-size: 25px !important;
+}
+
+.authentication-container form #feedback {
+    margin-top: 20px;
+}

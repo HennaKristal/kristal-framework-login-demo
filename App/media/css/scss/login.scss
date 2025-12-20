@@ -1,0 +1,67 @@
+.login-page {
+
+    margin-top: 60px;
+    margin-bottom: 60px;
+    
+    .login-title {
+
+    }
+    
+    .login-subtitle {
+        color: $subtitle_color;
+        margin-bottom: 32px;
+    }
+
+    .btn {
+        margin-top: 20px;
+    }
+
+    .login-remember-email-container {
+        margin-top: -40px;
+    }
+
+    @media (max-width: 767px) {
+        .login-remember-email-container {
+            margin-top: 0px;
+            
+            input {
+                padding: 12px;
+            }
+
+            label {
+                margin-top: 3px;
+                margin-left: 12px;
+            }
+        }
+    }
+}
+
+
+/* Forgot password page */
+.forgot-password-page {
+    margin-top: 60px;
+    margin-bottom: 60px;
+
+    .btn {
+        margin-top: 20px;
+    }
+
+    .reset-description {
+        margin-bottom: 32px;
+    }
+}
+
+
+/* Reset password page */
+.reset-password-page {
+    margin-top: 60px;
+    margin-bottom: 60px;
+
+    .btn {
+        margin-top: 20px;
+    }
+
+    .reset-description {
+        margin-bottom: 32px;
+    }
+}
