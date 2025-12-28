@@ -44,7 +44,7 @@ function webpProduction(string $file, int $compression)
     $cleanName = preg_replace("/\.[a-zA-Z0-9]+$/", "", $cleanName);
     $cleanName = $cleanName . "-" . $compression . ".webp";
 
-    return URL_BASE . "cache/webp/" . $cleanName;
+    return URL_WEBP . $cleanName;
 }
 
 
@@ -103,7 +103,7 @@ function webpDevelopment(string $file, int $compression)
         }
 
         $fileName = basename($outputPath);
-        return URL_BASE . "cache/webp/" . $fileName;
+        return URL_WEBP . $fileName;
     }
 
     // Build output
@@ -114,7 +114,7 @@ function webpDevelopment(string $file, int $compression)
     if (file_exists($outputPath))
     {
         $fileName = basename($outputPath);
-        return URL_BASE . "cache/webp/" . $fileName;
+        return URL_WEBP . $fileName;
     }
 
     // Load source
@@ -136,5 +136,5 @@ function webpDevelopment(string $file, int $compression)
     imagedestroy($image);
 
     $fileName = basename($outputPath);
-    return URL_BASE . "cache/webp/" . $fileName;
+    return URL_WEBP . $fileName;
 }

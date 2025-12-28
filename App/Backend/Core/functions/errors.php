@@ -45,7 +45,7 @@ function kristal_configureErrorReporting(): void
 // ------------------------------------------------------------------------------------------------
 // Error handler
 // ------------------------------------------------------------------------------------------------
-function kristal_errorHandler(string $type, string $message, string $file, int $line): void
+function kristal_errorHandler(string|int $type, string $message, string $file, int $line): void
 {
     $label = "Error";
 
