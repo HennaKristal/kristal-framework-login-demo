@@ -47,5 +47,7 @@ class FormRequest
             $requestData = $_POST + $_FILES;
             $this->{$requestedMethod}($requestData);
         }
+
+        redirectBack();
     }
 }

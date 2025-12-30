@@ -71,7 +71,8 @@ function redirectBack(?string $fallback = null): void
         exit;
     }
 
-    refreshPage();
+    header("Location: /");
+    exit;
 }
 
 function refreshPage(): void
