@@ -2,30 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://YOUR_WEBSITE_NAME/</loc>
-    <lastmod>2025-12-14T15:18:23+02:00</lastmod>
+    <lastmod>2026-01-31T10:22:58+02:00</lastmod>
   </url>
   <url>
     <loc>https://YOUR_WEBSITE_NAME/create-account/</loc>
-    <lastmod>2025-12-14T15:18:23+02:00</lastmod>
+    <lastmod>2026-01-31T10:22:58+02:00</lastmod>
   </url>
   <url>
     <loc>https://YOUR_WEBSITE_NAME/activate-account/</loc>
-    <lastmod>2025-12-14T15:18:23+02:00</lastmod>
+    <lastmod>2026-01-31T10:22:58+02:00</lastmod>
   </url>
   <url>
     <loc>https://YOUR_WEBSITE_NAME/login/</loc>
-    <lastmod>2025-12-14T15:18:23+02:00</lastmod>
+    <lastmod>2026-01-31T10:22:58+02:00</lastmod>
   </url>
   <url>
     <loc>https://YOUR_WEBSITE_NAME/two-factor-authentication/</loc>
-    <lastmod>2025-12-14T15:18:23+02:00</lastmod>
+    <lastmod>2026-01-31T10:22:58+02:00</lastmod>
   </url>
   <url>
     <loc>https://YOUR_WEBSITE_NAME/forgot-password/</loc>
-    <lastmod>2025-12-14T15:18:23+02:00</lastmod>
+    <lastmod>2026-01-31T10:22:58+02:00</lastmod>
   </url>
   <url>
     <loc>https://YOUR_WEBSITE_NAME/reset-password/</loc>
-    <lastmod>2025-12-14T15:18:23+02:00</lastmod>
+    <lastmod>2026-01-31T10:22:58+02:00</lastmod>
   </url>
 </urlset>

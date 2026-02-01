@@ -8,6 +8,3 @@
 
 <p>This code expires in 5 minutes.</p>
 
-<br>
-
-<p>Best regards,<br>Henna Kristal</p>

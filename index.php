@@ -34,7 +34,7 @@ define("PATH_JS", PATH_ROOT . "App/media/javascript/");
 define("PATH_TRANSLATIONS", PATH_ROOT . "App/media/translations/");
 define("PATH_CACHE", PATH_ROOT . "storage/cache/");
 define("PATH_WEBP", PATH_ROOT . "storage/webp/");
-define("PATH_WEBP", PATH_ROOT . "storage/logs/");
+define("PATH_LOGS", PATH_ROOT . "storage/logs/");
 define("PATH_TEMPLATES", PATH_ROOT . "App/templates/");
 define("PATH_CONFIG", PATH_ROOT . "config/");
 define("PATH_CORE", PATH_ROOT . "App/Backend/Core/");

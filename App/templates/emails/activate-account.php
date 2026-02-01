@@ -9,7 +9,3 @@
 <br>
 
 <p>If you did not create an account, you may safely ignore this message.</p>
-
-<br>
-
-<p>Best regards,<br>Henna Kristal</p>

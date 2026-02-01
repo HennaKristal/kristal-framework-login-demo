@@ -7,7 +7,3 @@
 <br>
 
 <p>If you did not request this, you can safely ignore this message.</p>
-
-<br>
-
-<p>Best regards,<br>Henna Kristal</p>
