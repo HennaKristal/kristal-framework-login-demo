@@ -40,6 +40,33 @@ class Session
         return hash('sha256', self::getUserAgent());
     }
 
+    public static function getDeviceLabel(): string
+    {
+        if (!isset($_SERVER["HTTP_USER_AGENT"]))
+        {
+            return "Unknown device";
+        }
+
+        $userAgent = strtolower($_SERVER["HTTP_USER_AGENT"]);
+
+        if (strpos($userAgent, "windows") !== false)
+            return "Windows device";
+
+        if (strpos($userAgent, "macintosh") !== false || strpos($userAgent, "mac os") !== false)
+            return "Mac device";
+
+        if (strpos($userAgent, "linux") !== false)
+            return "Linux device";
+
+        if (strpos($userAgent, "iphone") !== false || strpos($userAgent, "ipad") !== false)
+            return "iOS device";
+
+        if (strpos($userAgent, "android") !== false)
+            return "Android device";
+
+        return "Unknown device";
+    }
+
     private static function startSession(string $visitorIdentity): void
     {
         if (SESSION_NAME == "________")
@@ -66,7 +93,7 @@ class Session
         ini_set('session.cookie_path', '/');
         ini_set('session.cookie_secure', '1');
         ini_set('session.cookie_httponly', '1');
-        ini_set('session.cookie_samesite', COOKIE_SAMESITE);
+        ini_set('session.cookie_samesite', SESSION_SAMESITE);
         ini_set('session.use_strict_mode', '1');
 
         session_start();
@@ -84,9 +111,26 @@ class Session
         }
         else if (self::get("visitor_identity") !== $visitorIdentity)
         {
-            // Restart if user's IP address doesn't match the original one
-            self::restart();
+            // Restart if user's visitor identity doesn't match the original one
+            if (RESTART_SESSION_ON_VISITOR_MISMATCH)
+                self::restart();
         }
+    }
+
+    public static function removeRememberCookie(): void
+    {
+        setcookie(
+            COOKIE_NAME,
+            "",
+            [
+                "expires" => time() - 3600,
+                "path" => "/",
+                "domain" => DOMAIN,
+                "secure" => true,
+                "httponly" => true,
+                "samesite" => "Strict"
+            ]
+        );
     }
 
     private static function regenerateSessionIdPeriodically(): void
@@ -95,47 +139,29 @@ class Session
         if (SESSION_REGENERATE_ID_TIME === 0)
             return;
 
-        $lastRegeneration = self::get("last_id_regeneration_time");
+        $lastRegeneration = (int) self::get("last_id_regeneration_time", 0);
 
-        // If no regeneration has been tracked yet, set it now
-        if ($lastRegeneration === null)
-        {
+        if ($lastRegeneration === 0) {
             self::add("last_id_regeneration_time", time());
-            return;
         }
-
+        
         // If enough time has passed, regenerate
         if (time() - (int)$lastRegeneration >= SESSION_REGENERATE_ID_TIME)
         {
-            session_regenerate_id(true);
-            self::add("last_id_regeneration_time", time());
+            self::regenerateId();
         }
     }
 
     public static function end(): void
     {
+        Session::removeRememberCookie();
+        
         // Remove all session variables
         self::removeAll();
     
         // Destroy session data on server
         if (session_status() === PHP_SESSION_ACTIVE)
             session_destroy();
-    
-        // Destroy session cookie in browser
-        if (ini_get("session.use_cookies"))
-        {
-            $parameters = session_get_cookie_params();
-    
-            setcookie(
-                session_name(),
-                "",
-                time() - 3600,
-                $parameters["path"],
-                $parameters["domain"],
-                $parameters["secure"],
-                $parameters["httponly"]
-            );
-        }
     }
 
     public static function restart(): void
@@ -143,6 +169,17 @@ class Session
         self::end();
         self::start();
     }
+
+    public static function regenerateId(): void
+    {
+        if (!self::isActive()) {
+            return;
+        }
+    
+        session_regenerate_id(true);
+        self::add("last_id_regeneration_time", time());
+    }
+    
 
     // Add variables to session
     public static function add(string $identifier, $value): void
@@ -217,7 +254,7 @@ class Session
         {
             return;
         }
-
+        
         // Check has the user been afk longer than the allowed duration
         if (time() - (int)$timeout > $duration)
         {
