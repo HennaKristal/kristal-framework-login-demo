@@ -73,51 +73,67 @@ class Router
     {
         foreach ($routes as $route)
         {
+            $route = trim((string)$route, "/");
+            $route = $route === "" ? "" : $route . "/";
             $this->ignoreMaintenanceRoutes[] = $route;
         }
     }
 
     private function getURLRequest(): array
     {
-        // Parse page name and variables from the URL
         $url = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
-        $params = array_filter(explode("/", $url));
-        $params = array_values($params);
-        
-        // Handle multilingual support
+        $segments = array_filter(explode("/", (string)$url), "strlen");
+        $segments = array_values($segments);
+
+        $prefixRoute = "";
+        $routeSegments = $segments;
+
         if (ENABLE_LANGUAGES)
         {
-            // Get language and page from URL parameters
-            $language = isset($params[0]) ? strtolower($params[0]) : "";
-            $route = isset($params[1]) ? strtolower($params[1]) : "";
+            $language = isset($segments[0]) ? strtolower($segments[0]) : "";
 
-            // Redirect to default language home page if language was not valid
-            if (!in_array($language, array_map('strtolower', AVAILABLE_LANGUAGES)))
+            if (!in_array($language, array_map("strtolower", AVAILABLE_LANGUAGES), true))
             {
                 setAppLocale(DEFAULT_LANGUAGE);
                 redirect(route(""));
             }
 
-            $route = $language . "/" . $route;
-            unset($params[0], $params[1]);
             setAppLocale($language);
-        }
-        else
-        {
-            $route = isset($params[0]) ? strtolower($params[0]) : "";
-            unset($params[0]);
+
+            $prefixRoute = $language . "/";
+            $routeSegments = array_slice($segments, 1);
         }
 
-        // Make sure page ends with "/"
-        $route = trim($route, "/") . "/";
+        return $this->resolveRoute($routeSegments, $prefixRoute);
+    }
 
-        // Set "" and "/" to be the same
-        if ($route === "/")
+    private function resolveRoute(array $segments, string $prefixRoute): array
+    {
+        $segmentCount = count($segments);
+
+        for ($length = $segmentCount; $length >= 0; $length--)
         {
-            $route = "";
+            $candidateSegments = array_slice($segments, 0, $length);
+            $candidate = implode("/", $candidateSegments);
+            $candidate = trim($candidate, "/");
+
+            if ($candidate === "")
+            {
+                $route = $prefixRoute;
+            }
+            else
+            {
+                $route = trim($prefixRoute . $candidate, "/") . "/";
+            }
+
+            if (isset($this->registeredRoutes[$route]))
+            {
+                $variables = array_slice($segments, $length);
+                return ["route" => $route, "variables" => array_values($variables)];
+            }
         }
-        
-        return ['route' => $route, 'variables' => array_values($params)];
+
+        return ["route" => $prefixRoute, "variables" => array_values($segments)];
     }
 
     protected function render(string $page, array $variables = []): void
