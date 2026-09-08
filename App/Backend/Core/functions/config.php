@@ -59,7 +59,6 @@ foreach ($kristalMandatoryConstants as $constant)
     if (!defined($constant))
     {
         $message = PRODUCTION_MODE ? "A critical error has occurred. Please contact the site administrator." : "Mandatory configuration variable $constant is not set, please create this constant to the project's config.php file.";
-        debuglog($message);
         exit($message);
     }
 }

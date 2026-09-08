@@ -146,6 +146,12 @@ define("SESSION_NAME", "________");
 // Session expires after x seconds (0 = when browser closed)
 define("SESSION_LIFETIME", 0);
 
+// How long session should remember user
+define("REMEMBER_ME_SESSION_LIFETIME", 86400);
+
+// Restart session if user can not be matched to previous user
+define("RESTART_SESSION_ON_VISITOR_MISMATCH", true);
+
 // Session ID is regenerated every x seconds (0 to always keep same ID)
 define("SESSION_REGENERATE_ID_TIME", 180);
 
@@ -168,12 +174,6 @@ define("REGENERATE_CSRF_ON_PAGE_REFRESH", false);
 
 // Replace with a securely generated string (30-50 characters recommended)
 define("COOKIE_NAME", "________");
-
-// Cookies are set to expire after a specified number of seconds
-define("COOKIE_LIFETIME", 86400);
-
-// Control cross-site cookie behavior. Recommended values: "Strict" or "Lax"
-define("COOKIE_SAMESITE", "Lax");
 
 
 
