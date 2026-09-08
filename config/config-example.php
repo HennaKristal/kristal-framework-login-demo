@@ -143,14 +143,14 @@ define("RECAPTCHA_V3_SITE_SECRET", "xxxxxxxxxxxxxxxxxxxxxxxxxxxx");
 // Replace with a securely generated string (30-50 characters recommended)
 define("SESSION_NAME", "________");
 
+// Replace with a securely generated string (30-50 characters recommended)
+define("COOKIE_NAME", "________");
+
 // Session expires after x seconds (0 = when browser closed)
 define("SESSION_LIFETIME", 0);
 
-// How long session should remember user
+// Session duration if remember me was set true
 define("REMEMBER_ME_SESSION_LIFETIME", 86400);
-
-// Restart session if user can not be matched to previous user
-define("RESTART_SESSION_ON_VISITOR_MISMATCH", true);
 
 // Session ID is regenerated every x seconds (0 to always keep same ID)
 define("SESSION_REGENERATE_ID_TIME", 180);
@@ -164,16 +164,8 @@ define("SESSION_SAMESITE", "Lax");
 // Regenerate CSRF tokens on each page request for heightened security
 define("REGENERATE_CSRF_ON_PAGE_REFRESH", false);
 
-
-
-
-
-# --------------------------------------------------------------------------
-# Cookie configurations
-# --------------------------------------------------------------------------
-
-// Replace with a securely generated string (30-50 characters recommended)
-define("COOKIE_NAME", "________");
+// Session restarts if visitor UserAgent does not match one saved to session
+define("RESTART_SESSION_ON_VISITOR_MISMATCH", true);
 
 
 
