@@ -26,20 +26,20 @@ class SiteMapper
         }
 
         // Create new sitemap if it doesn't exist
-        $this->createSitemap($this->sitemapPath);
+        $this->createSitemap();
     }
 
     private function createSitemap(): void
     {
         $sitemap = new \SimpleXMLElement('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></urlset>');
-        
+
         foreach ($this->registeredRoutes as $route => $handler)
         {
             $url = $sitemap->addChild('url');
             $url->addChild('loc', esc_url(URL_BASE . $route));
             $url->addChild('lastmod', date('c'));
         }
-        
+
         // Create a DOMDocument and import the SimpleXMLElement
         $dom = new \DOMDocument('1.0');
         $dom->preserveWhiteSpace = false;
@@ -49,13 +49,18 @@ class SiteMapper
         $domElement = $dom->appendChild($domElement);
 
         // Save the formatted XML
-        $dom->save('sitemap.xml');
+        $dom->save($this->sitemapPath);
     }
 
     private function synchronizeSitemap(): void
     {
         $updateAvailable = false;
         $sitemap = simplexml_load_file($this->sitemapPath);
+        if ($sitemap === false)
+        {
+            debuglog("Could not read sitemap XML: " . $this->sitemapPath, "warning");
+            return;
+        }
 
         // Build a map of existing <loc> entries
         $existingEntries = [];
@@ -64,12 +69,12 @@ class SiteMapper
             $loc = (string)$entry->loc;
             $existingEntries[$loc] = $entry;
         }
-    
+
         // Add missing routes
         foreach ($this->registeredRoutes as $route => $handler)
         {
             $loc = esc_url(URL_BASE . $route);
-    
+
             if (!isset($existingEntries[$loc]))
             {
                 $url = $sitemap->addChild("url");
@@ -78,12 +83,12 @@ class SiteMapper
                 $updateAvailable = true;
             }
         }
-    
+
         // Delete old depricated entries
         foreach ($existingEntries as $loc => $entry)
         {
             $route = str_replace(URL_BASE, "", $loc);
-    
+
             if (!isset($this->registeredRoutes[$route]))
             {
                 $dom = dom_import_simplexml($entry);
@@ -91,22 +96,22 @@ class SiteMapper
                 $updateAvailable = true;
             }
         }
-    
+
         // Update lastRenderedTemplate timestamp
         $templatePath = PATH_TEMPLATES . $this->lastRenderedTemplate;
 
-        if (file_exists($templatePath))
+        if (is_file($templatePath))
         {
             $pageLastModified = filemtime($templatePath);
             $renderedRouteLoc = esc_url(URL_BASE . $this->lastRenderedURL);
-        
+
             foreach ($sitemap->url as $entry)
             {
                 if ((string)$entry->loc === $renderedRouteLoc)
                 {
                     // Read lastmod from sitemap entry
                     $sitemapEntryLastMod = strtotime((string)$entry->lastmod);
-    
+
                     // Compare template last modified time vs entry timestamp
                     if ($pageLastModified > $sitemapEntryLastMod)
                     {

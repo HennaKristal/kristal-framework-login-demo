@@ -20,7 +20,14 @@ class Cache
             'data' => serialize($value)
         ];
 
-        return file_put_contents($filePath, json_encode($content, JSON_PRETTY_PRINT)) !== false;
+        $json = json_encode($content, JSON_PRETTY_PRINT);
+        if ($json === false)
+        {
+            debuglog("Could not encode cache data for {$name}: " . json_last_error_msg(), "warning");
+            return false;
+        }
+
+        return file_put_contents($filePath, $json, LOCK_EX) !== false;
     }
 
     public static function get(string $name)
@@ -31,10 +38,15 @@ class Cache
         if (!file_exists($filePath))
             return null;
 
-        $content = json_decode(file_get_contents($filePath), true);
+        $json = file_get_contents($filePath);
+        if ($json === false)
+            return null;
+
+        $content = json_decode($json, true);
 
         // Remove cache if corrupted or invalid
-        if (!is_array($content) || !isset($content['expires'], $content['data']))
+        if (!is_array($content) || !isset($content['expires'], $content['data'])
+            || !is_int($content['expires']) || !is_string($content['data']))
         {
             debuglog("Cache file is invalid or corrupted for {$name}. Removing file.", "warning");
             self::remove($name);
@@ -58,8 +70,7 @@ class Cache
 
         if (file_exists($filePath))
         {
-            unlink($filePath);
-            return true;
+            return unlink($filePath);
         }
 
         return false;
@@ -76,21 +87,21 @@ class Cache
     private static function parseExpiry($duration): int
     {
         if ($duration === "never")
-            return PHP_INT_MAX; 
+            return PHP_INT_MAX;
 
         $expires = strtotime("now + " . $duration);
 
         if ($expires === false)
         {
             debuglog("Invalid cache duration. Duration given: {$duration}", "warning");
-            return PHP_INT_MAX;
+            return time();
         }
 
         return $expires;
     }
-    
+
     private static function isExpired(int $expires): bool
     {
-        return $expires !== PHP_INT_MAX && time() > $expires;
+        return $expires !== PHP_INT_MAX && time() >= $expires;
     }
 }

@@ -4,6 +4,11 @@
 define("ACCESS", "Granted");
 
 // Load configurations
+if (!is_readable(PATH_CONFIG . "config.php"))
+{
+    http_response_code(500);
+    exit("Configuration is missing. Copy config/config-example.php to config/config.php and configure your site.");
+}
 require_once PATH_CONFIG . "config.php";
 require_once PATH_CORE . "functions/config.php";
 
@@ -14,6 +19,7 @@ if (file_exists(PATH_ROOT . "vendor/autoload.php"))
 }
 else
 {
+    http_response_code(500);
     if (PRODUCTION_MODE)
     {
         exit("A critical error has occurred. Please contact the site administrator.");

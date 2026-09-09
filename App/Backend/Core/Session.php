@@ -26,7 +26,7 @@ class Session
         {
             return $remoteAddress;
         }
-    
+
         return "unknown";
     }
 
@@ -52,17 +52,17 @@ class Session
         if (strpos($userAgent, "windows") !== false)
             return "Windows device";
 
-        if (strpos($userAgent, "macintosh") !== false || strpos($userAgent, "mac os") !== false)
-            return "Mac device";
-
-        if (strpos($userAgent, "linux") !== false)
-            return "Linux device";
-
         if (strpos($userAgent, "iphone") !== false || strpos($userAgent, "ipad") !== false)
             return "iOS device";
 
         if (strpos($userAgent, "android") !== false)
             return "Android device";
+
+        if (strpos($userAgent, "macintosh") !== false || strpos($userAgent, "mac os") !== false)
+            return "Mac device";
+
+        if (strpos($userAgent, "linux") !== false)
+            return "Linux device";
 
         return "Unknown device";
     }
@@ -71,17 +71,9 @@ class Session
     {
         if (SESSION_NAME == "________")
         {
-            if (PRODUCTION_MODE)
-            {
-                debuglog("Could not start session for security reasons because the session name was default value", "warning");
-                return;
-            }
-            else
-            {
-                kristal_fatalExit("Please update your session key from the default value to a unique value in config.php");
-            }
+            kristal_fatalExit("Please update your session key from the default value to a unique value in config.php");
         }
-        
+
         session_name(SESSION_NAME);
 
         if (DOMAIN !== "")
@@ -91,15 +83,18 @@ class Session
 
         ini_set('session.cookie_lifetime', SESSION_LIFETIME);
         ini_set('session.cookie_path', '/');
-        ini_set('session.cookie_secure', '1');
+        ini_set('session.cookie_secure', str_starts_with(URL_BASE, 'https://') ? '1' : '0');
         ini_set('session.cookie_httponly', '1');
         ini_set('session.cookie_samesite', SESSION_SAMESITE);
         ini_set('session.use_strict_mode', '1');
 
-        session_start();
+        if (!session_start())
+        {
+            kristal_fatalExit("Could not start the session. Check PHP session storage permissions.");
+        }
 
         self::regenerateSessionIdPeriodically();
-        
+
         // Check session duration
         self::afkTimeout(SESSION_AFK_TIMEOUT);
 
@@ -143,8 +138,9 @@ class Session
 
         if ($lastRegeneration === 0) {
             self::add("last_id_regeneration_time", time());
+            return;
         }
-        
+
         // If enough time has passed, regenerate
         if (time() - (int)$lastRegeneration >= SESSION_REGENERATE_ID_TIME)
         {
@@ -155,13 +151,21 @@ class Session
     public static function end(): void
     {
         Session::removeRememberCookie();
-        
+
         // Remove all session variables
         self::removeAll();
-    
+
         // Destroy session data on server
-        if (session_status() === PHP_SESSION_ACTIVE)
+        if (self::isActive())
+        {
+            $cookie = session_get_cookie_params();
+            unset($cookie["lifetime"]);
+            $cookie["expires"] = time() - 3600;
+            setcookie(session_name(), "", $cookie);
             session_destroy();
+        }
+        unset($_COOKIE[session_name()]);
+        session_id("");
     }
 
     public static function restart(): void
@@ -175,11 +179,11 @@ class Session
         if (!self::isActive()) {
             return;
         }
-    
+
         session_regenerate_id(true);
         self::add("last_id_regeneration_time", time());
     }
-    
+
 
     // Add variables to session
     public static function add(string $identifier, $value): void
@@ -195,7 +199,7 @@ class Session
     }
 
     // Remove variables from session
-    public static function remove(string $key): void
+    public static function remove(string|array $key): void
     {
         // Remove single variable
         if (!is_array($key))
@@ -214,7 +218,7 @@ class Session
     // Remove every variable from session
     public static function removeAll(): void
     {
-        session_unset();
+        $_SESSION = [];
     }
 
     // Get variables from session
@@ -225,24 +229,21 @@ class Session
 
     public static function getAll(): array
     {
-        return $_SESSION;
+        return $_SESSION ?? [];
     }
 
     // Check if session is already active
     private static function isActive(): bool
     {
-        $serverInterface = php_sapi_name();
-
-        if ($serverInterface === "cli") {
-            return false;
-        }
-
         return session_status() === PHP_SESSION_ACTIVE;
     }
 
     // End Session if user isn't active for x seconds (specified in the config.php)
     private static function afkTimeout(int $duration): void
     {
+        if ($duration <= 0)
+            return;
+
         // Get previous time afk_timeout was set
         $timeout = self::get("afk_timeout");
 
@@ -254,7 +255,7 @@ class Session
         {
             return;
         }
-        
+
         // Check has the user been afk longer than the allowed duration
         if (time() - (int)$timeout > $duration)
         {

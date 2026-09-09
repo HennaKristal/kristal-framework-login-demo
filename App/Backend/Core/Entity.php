@@ -85,7 +85,8 @@ abstract class Entity extends Database
         if (!$this->persisted)
             return false;
 
-        $result = $this->table()->where($this->primary_key, $this->identifier_value)->delete();
+        $this->table()->where($this->primary_key, $this->identifier_value);
+        $result = parent::delete();
 
         if ($result)
         {

@@ -90,7 +90,7 @@ class Mailer
         }
         catch (Exception $e)
         {
-            debuglog("Mailer error: {$exception->getMessage()}", "warning");
+            debuglog("Mailer error: {$e->getMessage()}", "warning");
             return false;
         }
         finally

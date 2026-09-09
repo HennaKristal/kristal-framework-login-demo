@@ -3,7 +3,7 @@
 // ------------------------------------------------------------------------------------------------
 // Debug output for variables
 // ------------------------------------------------------------------------------------------------
-function debug(mixed $value, string $name = null): void
+function debug(mixed $value, ?string $name = null): void
 {
     if (ENABLE_DEBUG_DISPLAY && !PRODUCTION_MODE)
     {
@@ -22,7 +22,7 @@ function debuglog(mixed $message, string $severity = "Debug"): void
 
     $time = date("Y-m-d H:i:s e");
 
-    if (is_array($message))
+    if (is_array($message) || is_object($message))
     {
         $message = print_r($message, true);
     }

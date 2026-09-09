@@ -85,6 +85,8 @@ class Database
     {
         $this->assertSafeIdentifier($table);
         $this->assertSafeIdentifier($primaryKey);
+        $this->assertSafeIdentifier($engine);
+        $this->assertSafeIdentifier($charset);
 
         $sql = "CREATE TABLE IF NOT EXISTS {$table} (";
 
@@ -154,7 +156,7 @@ class Database
             kristal_fatalExit("Invalid SQL identifier: {$value}");
         }
     }
-    
+
     protected function assertSafeQualifiedIdentifier(string $value): void
     {
         if (!preg_match('/^[a-zA-Z0-9_\.]+$/', $value))
@@ -227,14 +229,14 @@ class Database
         if (!empty($this->arguments['where'])) {
             $this->arguments['where'] .= " $connector ";
         }
-    
+
         $this->arguments['where'] .= $sql;
-    
+
         foreach ($bindings as $key => $value) {
             $this->securedInputs[$key] = $value;
         }
     }
-    
+
     public function where(string $field, mixed $value, string $operator = "="): static
     {
         $this->assertSafeQualifiedIdentifier($field);
@@ -244,54 +246,57 @@ class Database
         $this->baseWhere('and', "$field $operator :$param", [$param => $value]);
         return $this;
     }
-    
+
     public function orWhere(string $field, mixed $value, string $operator = "="): static
     {
         $this->assertSafeQualifiedIdentifier($field);
         $operator = $this->normalizeOperator($operator);
- 
+
         $param = 'param_' . uniqid();
         $this->baseWhere('or', "$field $operator :$param", [$param => $value]);
         return $this;
     }
-    
+
     public function whereLike(string $field, string $value): static
     {
         return $this->where($field, "%$value%", 'LIKE');
     }
-    
+
     public function whereStartsWith(string $field, string $value): static
     {
         return $this->where($field, "$value%", 'LIKE');
     }
-    
+
     public function whereEndsWith(string $field, string $value): static
     {
         return $this->where($field, "%$value", 'LIKE');
     }
-    
+
     public function whereIn(string $field, array $values): static
     {
         if (empty($values))
+        {
+            $this->baseWhere('and', '1 = 0');
             return $this;
-    
+        }
+
         $this->assertSafeQualifiedIdentifier($field);
 
         $placeholders = [];
         $bindings = [];
-    
+
         foreach ($values as $value) {
             $key = 'param_' . uniqid();
             $placeholders[] = ":$key";
             $bindings[$key] = $value;
         }
-    
+
         $sql = "$field IN (" . implode(',', $placeholders) . ")";
-    
+
         $this->baseWhere('and', $sql, $bindings);
         return $this;
     }
-    
+
     public function whereBetween(string $field, mixed $min, mixed $max, bool $not = false): static
     {
         $this->assertSafeQualifiedIdentifier($field);
@@ -302,7 +307,7 @@ class Database
         $this->baseWhere('and', $sql, [$p1 => $min, $p2 => $max]);
         return $this;
     }
-    
+
     public function whereNull(string $field): static
     {
         $this->assertSafeQualifiedIdentifier($field);
@@ -310,7 +315,7 @@ class Database
         $this->baseWhere('and', "$field IS NULL");
         return $this;
     }
-    
+
     public function whereNotNull(string $field): static
     {
         $this->assertSafeQualifiedIdentifier($field);
@@ -372,7 +377,7 @@ class Database
     {
         $statement = $this->connection->prepare($query);
         $statement->execute($securedInputs);
-    
+
         $row = $statement->fetch(\PDO::FETCH_ASSOC);
         return $row === false ? new \stdClass() : (object) $row;
     }
@@ -381,7 +386,7 @@ class Database
     {
         $statement = $this->connection->prepare($query);
         $statement->execute($securedInputs);
-    
+
         return (object) $statement->fetchAll(\PDO::FETCH_ASSOC);
     }
 
@@ -449,8 +454,8 @@ class Database
         $columns = [];
         $placeholders = [];
         $bindings = [];
-    
-        foreach ($data as $column => $value) 
+
+        foreach ($data as $column => $value)
         {
             if (!preg_match('/^[a-zA-Z0-9_]+$/', $column))
                 continue;
@@ -465,15 +470,15 @@ class Database
         {
             kristal_fatalExit("No valid columns provided for insert.");
         }
-    
+
         $cols = implode(', ', $columns);
         $vals = implode(', ', $placeholders);
 
         $sql = "INSERT INTO {$this->table} ($cols) VALUES ($vals)";
-    
+
         $this->connection->prepare($sql)->execute($bindings);
         $this->resetArguments();
-    
+
         return true;
     }
 
@@ -481,10 +486,10 @@ class Database
     {
         if (empty($data))
             return false;
-    
+
         $sets = [];
         $bindings = [];
-    
+
         foreach ($data as $column => $value)
         {
             if (!preg_match('/^[a-zA-Z0-9_]+$/', $column))
@@ -499,9 +504,14 @@ class Database
         {
             kristal_fatalExit("No valid columns provided for update.");
         }
-    
+
+        if (empty($this->arguments['where']))
+        {
+            kristal_fatalExit("Use a where condition before update().");
+        }
+
         $sql = "UPDATE {$this->table} SET " . implode(', ', $sets) . " WHERE {$this->arguments['where']}";
-    
+
         $this->connection->prepare($sql)->execute(array_merge($bindings, $this->securedInputs));
         $this->resetArguments();
         return true;

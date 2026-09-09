@@ -3,6 +3,7 @@
 $kristalMandatoryConstants = [
     "PRODUCTION_MODE",
     "MAINTENANCE_MODE",
+    "ENABLE_MAINTENANCE_LOGIN",
     "MAINTENANCE_PASSWORD",
     "MAINTENANCE_LOCKOUT_LIMIT",
     "MAINTENANCE_LOCKOUT_CLEAR_TIME",
@@ -58,7 +59,8 @@ foreach ($kristalMandatoryConstants as $constant)
 {
     if (!defined($constant))
     {
-        $message = PRODUCTION_MODE ? "A critical error has occurred. Please contact the site administrator." : "Mandatory configuration variable $constant is not set, please create this constant to the project's config.php file.";
+        http_response_code(500);
+        $message = (!defined("PRODUCTION_MODE") || PRODUCTION_MODE) ? "A critical error has occurred. Please contact the site administrator." : "Mandatory configuration variable $constant is not set, please create this constant to the project's config.php file.";
         exit($message);
     }
 }

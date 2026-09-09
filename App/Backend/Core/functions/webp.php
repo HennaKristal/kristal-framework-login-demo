@@ -85,7 +85,8 @@ function webpDevelopment(string $file, int $compression)
     }
 
     $relativeName = substr($filePath, $position + strlen($searchFolder));
-    $cleanName = str_replace("/", "-", $relativeName);
+    $cleanName = preg_replace("/[^a-zA-Z0-9\/\.\-_]/", "", $relativeName);
+    $cleanName = str_replace("/", "-", $cleanName);
 
     // Native webp
     if ($imageType === IMAGETYPE_WEBP)
@@ -97,7 +98,7 @@ function webpDevelopment(string $file, int $compression)
         $outputPath = PATH_WEBP . $cleanName . "-" . $compression . ".webp";
 
         // Use cached version if available
-        if (!file_exists($outputPath))
+        if (!is_file($outputPath) || filemtime($filePath) > filemtime($outputPath))
         {
             copy($filePath, $outputPath);
         }
@@ -111,10 +112,16 @@ function webpDevelopment(string $file, int $compression)
     $outputPath = PATH_WEBP . $cleanName . "-" . $compression . ".webp";
 
     // Cached version
-    if (file_exists($outputPath))
+    if (is_file($outputPath) && filemtime($outputPath) >= filemtime($filePath))
     {
         $fileName = basename($outputPath);
         return URL_WEBP . $fileName;
+    }
+
+    if (!function_exists("imagewebp"))
+    {
+        debuglog("WebP conversion requires the PHP GD extension with WebP support.", "warning");
+        return image($file);
     }
 
     // Load source
@@ -132,8 +139,8 @@ function webpDevelopment(string $file, int $compression)
     }
 
     // Generate
-    imagewebp($image, $outputPath, $compression);
-    imagedestroy($image);
+    if ($image === false || !imagewebp($image, $outputPath, $compression))
+        return "";
 
     $fileName = basename($outputPath);
     return URL_WEBP . $fileName;

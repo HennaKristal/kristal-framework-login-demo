@@ -18,25 +18,19 @@ function getAppLocale(): string
 // Translate
 function translate(string $key, array $variables = []): string
 {
-    // Make sure $variables is an array
-    if (!is_array($variables))
-    {
-        $variables = [$variables];
-    }
-
     // Get translations
     static $translations = null;
 
     if ($translations === null)
     {
         $path = PATH_TRANSLATIONS . 'translations.php';
-    
+
         if (!file_exists($path))
         {
             if (PRODUCTION_MODE)
             {
                 debuglog("Translation for text '$key' failed because text was not found in App/media/translations/translations.php file");
-                return vsprintf($key, $variables);
+                return $variables ? vsprintf($key, $variables) : $key;
             }
             else
             {
@@ -55,21 +49,21 @@ function translate(string $key, array $variables = []): string
 
     // Get translation language
     $language = getAppLocale();
-    
+
     // Return original string if no translation was found
     if (!array_key_exists($key, $translations))
     {
         debuglog("Translation for text '$key' failed because text was not found in App/media/translations/translations.php file");
-        return vsprintf($key, $variables);
+        return $variables ? vsprintf($key, $variables) : $key;
     }
 
     // return translated string if key and language were found
     if (isset($translations[$key][$language]))
     {
-        return vsprintf($translations[$key][$language], $variables);
+        return $variables ? vsprintf($translations[$key][$language], $variables) : $translations[$key][$language];
     }
 
     // Return original string if no translation was found
     debuglog("Translation for text '$key' failed because it did not have translation for language '$language'");
-    return vsprintf($key, $variables);
+    return $variables ? vsprintf($key, $variables) : $key;
 }

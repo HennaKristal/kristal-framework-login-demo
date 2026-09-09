@@ -37,7 +37,7 @@ function kristal_getAssetURL(string $folder, string $file): string
     $fileName = substr($filePath, $position);
 
     // URL version for css and javascript
-    if ($folder === "CSS" || $folder === "Javascript")
+    if ($folder === "css" || $folder === "javascript")
     {
         $fileName .= "?ver=" . filemtime($filePath);
     }
@@ -52,7 +52,7 @@ function jsPath(string $file) { return kristal_getAssetPath("javascript", $file)
 function downloadPath(string $file) { return kristal_getAssetPath("downloads", $file); }
 function audioPath(string $file) { return kristal_getAssetPath("audio", $file); }
 
-function kristal_getAssetPath(string $folder, string $file): string
+function kristal_getAssetPath(string $folder, string $file): ?string
 {
     $filePath = PATH_ROOT . "/App/media/" . $folder . "/" . $file;
 

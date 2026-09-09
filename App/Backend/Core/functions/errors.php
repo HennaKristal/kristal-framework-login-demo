@@ -7,8 +7,10 @@ kristal_configureErrorReporting();
 
 function kristal_configureErrorReporting(): void
 {
-    ini_set("display_startup_errors", ENABLE_DEBUG_DISPLAY ? "1" : "0");
-    ini_set("display_errors", ENABLE_DEBUG_DISPLAY ? "1" : "0");
+    $displayErrors = ENABLE_DEBUG_DISPLAY && !PRODUCTION_MODE;
+    ini_set("display_startup_errors", $displayErrors ? "1" : "0");
+    ini_set("display_errors", $displayErrors ? "1" : "0");
+    register_shutdown_function("kristal_shutDownHandler");
     ini_set("log_errors", ENABLE_DEBUG_LOG ? "1" : "0");
     ini_set("error_log", DEBUG_LOG_PATH);
 
@@ -29,7 +31,7 @@ function kristal_configureErrorReporting(): void
     if (DEBUG_IGNORE_DEPRECATED)
         $level &= ~(E_DEPRECATED | E_USER_DEPRECATED);
 
-    if (DEBUG_IGNORE_STRICT)
+    if (PHP_VERSION_ID < 80400 && DEBUG_IGNORE_STRICT)
         $level &= ~(E_STRICT);
 
     error_reporting($level);
@@ -37,7 +39,6 @@ function kristal_configureErrorReporting(): void
     if (ENABLE_DEBUG_DISPLAY)
     {
         set_error_handler("kristal_errorHandler");
-        register_shutdown_function("kristal_shutDownHandler");
     }
 }
 
@@ -47,6 +48,9 @@ function kristal_configureErrorReporting(): void
 // ------------------------------------------------------------------------------------------------
 function kristal_errorHandler(string|int $type, string $message, string $file, int $line): void
 {
+    if (!(error_reporting() & $type))
+        return;
+
     $label = "Error";
 
     if ($type === E_WARNING || $type === E_USER_WARNING || $type === E_CORE_WARNING || $type === E_COMPILE_WARNING)
@@ -64,7 +68,7 @@ function kristal_errorHandler(string|int $type, string $message, string $file, i
         if (DEBUG_IGNORE_DEPRECATED) return;
         $label = "Deprecated";
     }
-    elseif ($type === E_STRICT)
+    elseif (PHP_VERSION_ID < 80400 && $type === E_STRICT)
     {
         if (DEBUG_IGNORE_STRICT) return;
         $label = "Strict";
@@ -81,7 +85,7 @@ function kristal_errorOutput(string $label, string $message, string $file, int $
 {
     debuglog($message . " in " . $file . " on line " . $line, $label);
 
-    if (!PRODUCTION_MODE)
+    if (ENABLE_DEBUG_DISPLAY && !PRODUCTION_MODE)
     {
         require PATH_CORE . "templates/warning-output.php";
     }
@@ -109,7 +113,8 @@ function kristal_shutDownHandler(): void
         ob_end_clean();
 
     // Display custom error message for fatal errors
-    if (PRODUCTION_MODE)
+    http_response_code(500);
+    if (PRODUCTION_MODE || !ENABLE_DEBUG_DISPLAY)
         kristal_productionFatalErrorOutput();
     else
         kristal_fatalErrorOutput($error["message"], $error["file"], $error["line"]);
@@ -125,8 +130,8 @@ function kristal_productionFatalErrorOutput(): void
 function kristal_fatalErrorOutput(string $message, string $file, int $line): void
 {
     $lines = @file($file);
-    
-    if ($lines) 
+
+    if ($lines)
     {
         $start = max(0, $line - 11);
         $end = min(count($lines), $line + 10);
@@ -138,9 +143,10 @@ function kristal_fatalErrorOutput(string $message, string $file, int $line): voi
 
 function kristal_fatalExit(string $message, string $productionMessage = "A critical error has occurred. Please contact the site administrator."): void
 {
+    http_response_code(500);
     debuglog($message);
 
-    if (PRODUCTION_MODE)
+    if (PRODUCTION_MODE || !ENABLE_DEBUG_DISPLAY)
     {
         $message = $productionMessage;
     }

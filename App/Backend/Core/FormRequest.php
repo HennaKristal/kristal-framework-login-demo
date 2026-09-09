@@ -10,12 +10,12 @@ class FormRequest
     {
         $csrfIdentifier = $_POST["csrf_identifier"] ?? "";
         $csrfToken = $_POST["csrf_token"] ?? "";
-        $csrfData = Session::get("csrf_" . $csrfIdentifier);
+        $csrfData = is_string($csrfIdentifier) ? Session::get("csrf_" . $csrfIdentifier) : null;
 
-        if (REGENERATE_CSRF_ON_PAGE_REFRESH)
+        if (REGENERATE_CSRF_ON_PAGE_REFRESH && ($_SERVER["REQUEST_METHOD"] ?? "") === "GET")
             CSRF::reset();
 
-        if (!$csrfData)
+        if (!is_array($csrfData) || !is_string($csrfIdentifier) || !is_string($csrfToken))
             return;
 
         $requestedMethod = $csrfData["formRequest"];
@@ -30,14 +30,14 @@ class FormRequest
             return;
 
         // Make sure CSRF token matches
-        if ($csrfToken !== $expectedToken)
+        if (!hash_equals($expectedToken, $csrfToken))
             return;
 
         // Make sure requested method exists
         if (!method_exists($this, $requestedMethod))
             return;
 
-        $allowProtectedCalls = $parameters["allow_protected_calls"] === true;
+        $allowProtectedCalls = ($parameters["allow_protected_calls"] ?? false) === true;
         $method = new ReflectionMethod($this, $requestedMethod);
         $isPublic = $method->isPublic();
         $isProtectedAndAllowed = $method->isProtected() && $allowProtectedCalls;

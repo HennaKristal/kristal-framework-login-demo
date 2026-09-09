@@ -1,28 +1,28 @@
 /**
- * 
+ *
  * HOW TO USE SWITCH LANGUAGES:
- * 
+ *
  * <div id="language-selection">
  *     <label id="fi-button" switchLanguage="fi">FI</label>
  *     <label id="en-button" switchLanguage="en">EN</label>
  * </div>
- * 
- * 
- * 
+ *
+ *
+ *
  * HOW TO USE:
- * 
+ *
  * Normal Texts:
  * <p translationKey="TRANSLATION_KEY">default text</p>
- * 
+ *
  * Button values:
  * <button type="submit" class="btn btn-primary" translationKey="TRANSLATION_KEY">default text</button>
- * 
+ *
  * Input placeholders:
  * <input type="email" translationKey="TRANSLATION_KEY" placeholder="default text">
- * 
+ *
  * Tooltips:
  * <a href="#" data-bs-toggle="tooltip" tooltipTranslationKey="TRANSLATION_KEY" data-bs-title="default text" translationKey="TRANSLATION_KEY">default text</a>
- * 
+ *
  * Image alts
  * <img src="example.jpg" translationKey="TRANSLATION_KEY" alt="default text">
  */
@@ -37,7 +37,7 @@ let kristal_translations;
 $(document).ready(function()
 {
     kristal_language = localStorage.getItem(KRISTAL_LANGUAGE_KEY) || getVariable("language") || "en";
-    kristal_translation_url = getVariable("baseURL") + "/App/media/translations/translations.json";
+    kristal_translation_url = getVariable("baseURL") + "App/media/translations/translations.json";
 
     $("html").attr("translation", "language-" + kristal_language);
 
@@ -47,7 +47,7 @@ $(document).ready(function()
         const random = Math.round(Math.random() * (999999 - 1)) + 1;
         kristal_translation_url += "?" + random;
     }
-    
+
     // Get translation json file
     $.getJSON(kristal_translation_url, (data) => {
         kristal_translations = data;
@@ -65,7 +65,7 @@ function kristal_initTranslations()
     {
         event.preventDefault();
         $("#" + kristal_language + "-button").removeClass("active");
-        kristal_language = $(event.target).attr("switchLanguage");
+        kristal_language = $(event.currentTarget).attr("switchLanguage");
         localStorage.setItem(KRISTAL_LANGUAGE_KEY, kristal_language);
         kristal_updateTranslations();
     });
@@ -135,7 +135,7 @@ jQuery.fn.tooltipTranslate = function(key)
     if (!kristal_translations) { return; }
 
     key = key || $(this).attr("tooltipTranslationKey");
-    
+
     if (kristal_translations.hasOwnProperty(key))
     {
         $(this).attr("data-bs-title", kristal_translations[key][kristal_language]);

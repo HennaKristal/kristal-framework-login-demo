@@ -3,12 +3,12 @@
 // ------------------------------------------------------------------------------------------------
 // Page Helpers
 // ------------------------------------------------------------------------------------------------
-function page(string $file): string
+function page(string $file): string|false
 {
     $file = ensurePHPExtension($file);
     $realPath = realpath(PATH_TEMPLATES . $file);
 
-    if ($realPath === false)
+    if ($realPath === false || !is_file($realPath))
         return false;
 
     if (strpos($realPath, PATH_TEMPLATES) !== 0)
@@ -36,7 +36,7 @@ function route(string $page = ""): string
     return URL_BASE . $page;
 }
 
-function redirect(string $target = null): void
+function redirect(?string $target = null): void
 {
     // Redirect to given page
     if (!empty($target))
@@ -46,7 +46,8 @@ function redirect(string $target = null): void
     }
 
     // Redirect back to previous page
-    if (isset($_SERVER["HTTP_REFERER"]))
+    // Only trust a referrer from this site for automatic redirects.
+    if (isset($_SERVER["HTTP_REFERER"]) && str_starts_with($_SERVER["HTTP_REFERER"], URL_BASE))
     {
         header("Location: " . $_SERVER["HTTP_REFERER"]);
         exit;
@@ -58,7 +59,8 @@ function redirect(string $target = null): void
 function redirectBack(?string $fallback = null): void
 {
     // Redirect back to previous page
-    if (isset($_SERVER["HTTP_REFERER"]))
+    // Only trust a referrer from this site for automatic redirects.
+    if (isset($_SERVER["HTTP_REFERER"]) && str_starts_with($_SERVER["HTTP_REFERER"], URL_BASE))
     {
         header("Location: " . $_SERVER["HTTP_REFERER"]);
         exit;

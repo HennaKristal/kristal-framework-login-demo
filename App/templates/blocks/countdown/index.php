@@ -25,7 +25,7 @@ $atts = array_merge(array(
 ), $atts);
 
 $currentDate = new DateTime('now', new DateTimeZone(TIMEZONE));
-$targetDate = DateTime::createFromFormat('d.m.Y H:i:s', $date, new DateTimeZone(TIMEZONE));
+$targetDate = DateTime::createFromFormat('d.m.Y H:i:s', $atts['date'], new DateTimeZone(TIMEZONE));
 
 if ($targetDate === false)
 {

@@ -194,9 +194,9 @@ class Router
         {
             include_once page("base/footer.php");
         }
-        
+
         $this->lastRenderedTemplate = $page;
-        
+
     }
 
     private function renderMaintenancePage(): void
@@ -209,26 +209,26 @@ class Router
             $authenticationFailed = false;
             $authenticationAttemptLimitReached = false;
             $authenticationLockoutLabel = "";
-            $loginAttempts = Session::get("maintenance_login_attempts", 1);
+            $loginAttempts = Session::get("maintenance_login_attempts", 0);
             $lockoutStartedAt = Session::get("maintenance_lockout_started_at", null);
-    
+
             // Check have we reached login attempt count
             if ($loginAttempts >= MAINTENANCE_LOCKOUT_LIMIT)
             {
                 $authenticationAttemptLimitReached = true;
-    
+
                 if ($lockoutStartedAt === null)
                 {
                     $lockoutStartedAt = time();
                     Session::add("maintenance_lockout_started_at", $lockoutStartedAt);
                 }
             }
-    
+
             // Handle lockout countdown
             if ($authenticationAttemptLimitReached)
             {
                 $remainingLockoutSeconds = MAINTENANCE_LOCKOUT_CLEAR_TIME - (time() - $lockoutStartedAt);
-        
+
                 if ($remainingLockoutSeconds > 0)
                 {
                     if ($remainingLockoutSeconds > 60)
@@ -244,36 +244,43 @@ class Router
                 {
                     $loginAttempts = 0;
                     $authenticationAttemptLimitReached = false;
-                    Session::remove("maintenance_failed_attempts");
+                    Session::remove("maintenance_login_attempts");
                     Session::remove("maintenance_lockout_started_at");
                 }
             }
-    
+
             // Handle authentication request
             if (!$authenticationAttemptLimitReached && $_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["maintenance-password"]))
             {
                 if ($_POST["maintenance-password"] === MAINTENANCE_PASSWORD)
                 {
+                    Session::regenerateId();
                     Session::add("maintenance_access_granted", "Granted");
-                    return;
+                    Session::remove(["maintenance_login_attempts", "maintenance_lockout_started_at"]);
+                    redirect(route(""));
                 }
                 else
                 {
                     $authenticationFailed = true;
                     $loginAttempts++;
                     Session::add("maintenance_login_attempts", $loginAttempts);
+                    if ($loginAttempts >= MAINTENANCE_LOCKOUT_LIMIT)
+                    {
+                        Session::add("maintenance_lockout_started_at", time());
+                    }
                 }
             }
         }
-        
+
         // Render maintenance page
         $maintenancePagePath = PATH_TEMPLATES . "maintenance.php";
-    
+
         if (!file_exists($maintenancePagePath))
         {
             kristal_fatalExit("Maintenance page is missing. It should be located at " . $maintenancePagePath, "Site is under maintenance");
         }
 
+        http_response_code(503);
         include $maintenancePagePath;
         PHPJS::release();
         exit;

@@ -21,7 +21,7 @@ class CSRF
     {
         $sessionKey = "csrf_" . $identifier;
 
-        if (!Session::has($sessionKey))
+        if (!Session::has($sessionKey) || Session::get($sessionKey)["formRequest"] !== $formRequest)
         {
             Session::add($sessionKey, [
                 "token" => bin2hex(random_bytes(32)),
@@ -30,7 +30,7 @@ class CSRF
         }
 
         $token = Session::get($sessionKey)["token"];
-        
+
         echo "<input type='hidden' name='csrf_identifier' value='" . esc_html($identifier) . "'>";
         echo "<input type='hidden' name='csrf_token' value='" . esc_html($token) . "'>";
     }

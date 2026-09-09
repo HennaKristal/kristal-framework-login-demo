@@ -18,10 +18,10 @@ class Block
         {
             // Use directory name as the block name
             $block = basename($dir);
-            
+
             // The file we're looking for is index.php inside the directory
             $file = $dir . '/index.php';
-            
+
             // Check if the index.php file exists before registering it
             if (is_file($file))
             {
@@ -38,13 +38,7 @@ class Block
         ob_start();
 
         // Extract variables
-        foreach ($atts as $key => $value)
-        {
-            if (is_string($key))
-            {
-                $$key = $value;
-            }
-        }
+        extract($atts, EXTR_SKIP);
 
         include self::$blocks[$block];
 
