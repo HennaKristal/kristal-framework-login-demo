@@ -2,7 +2,7 @@
 # Rewrite Engine and Basic Configuration #
 # ====================================== #
 RewriteEngine On
-RewriteBase / 
+RewriteBase /
 
 
 # ========================== #
@@ -15,13 +15,14 @@ Options -Indexes
 # Force HTTPS Connections #
 # ======================= #
 RewriteCond %{HTTPS} !=on
-RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
-RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+RewriteCond %{HTTP:X-Forwarded-Proto} !^https$ [NC]
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=308,L]
 
 
 # ========================================= #
 # Normalize URLs by Adding Trailing Slashes #
 # ========================================= #
+RewriteCond %{REQUEST_METHOD} ^(?:GET|HEAD)$
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_URI} !^/$
@@ -51,7 +52,7 @@ RewriteRule . index.php [L,QSA]
     </IfModule>
 </FilesMatch>
 # Block specific files
-<FilesMatch "^(composer\.json|README\.md|license\.txt|\.gitignore)$">
+<FilesMatch "(?i)^(composer\.json|readme\.md|license\.txt|\.gitignore|\.htpasswd(?:\..*)?)$">
     <IfModule mod_authz_core.c>
         Require all denied
     </IfModule>
@@ -70,6 +71,7 @@ RedirectMatch 404 ^/\.vscode(/|$)
 RedirectMatch 404 ^/\.vs(/|$)
 RedirectMatch 404 ^/\.idea(/|$)
 RedirectMatch 404 ^/\.svn(/|$)
+RedirectMatch 404 ^/\.(agents|codex)(/|$)
 
 
 # ===================== #

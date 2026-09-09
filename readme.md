@@ -14,8 +14,8 @@ The framework is released under the MIT License, allowing anyone to freely use, 
 
 ## Server Requirements
 * Web Server: Apache or LiteSpeed with .htaccess support
-* PHP: version 8.3
-* PHP Extensions: imagick and pdo
+* PHP: version 8.3 or later within PHP 8.x
+* PHP Extensions: imagick, pdo, and the PDO driver for your database
 * Composer: Required for managing backend dependencies
 
 
@@ -23,8 +23,13 @@ The framework is released under the MIT License, allowing anyone to freely use, 
 1. Rename 'config-example.php' to 'config.php' and configure the framework settings.
 2. Upload the framework files to a server or local development environment.
 3. Run 'composer install --prefer-dist --optimize-autoloader' at the root folder to install dependencies from composer.json file.
+4. Replace `YOUR_WEBSITE_NAME` in `robots.txt` and `sitemap.xml` with your domain. Review the demo sitemap URLs and update or remove the example modification dates.
 
 After completing these steps, access your server's URL to view the built-in demo page.
+
+
+## Production deployment
+Set 'PRODUCTION_MODE' to 'true' and 'ENABLE_DEBUG_DISPLAY' to 'false' in config/config.php. Generate CSS and JavaScript during development before enabling production mode. Prefer an absolute 'DEBUG_LOG_PATH' outside the document root, writable by the PHP worker.
 
 
 ## Troubleshooting

@@ -2,20 +2,16 @@
 
 define("PATH_ROOT", __DIR__ . "/");
 
-define(
-    "DOMAIN",
-    explode(":", $_SERVER["HTTP_HOST"])[0]
-);
+$framework_https = !empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off";
+$framework_host = $_SERVER["HTTP_HOST"] ?? "";
+$framework_host = strtolower($framework_host);
+if (!preg_match('/^[a-z0-9.-]+(?::[0-9]+)?$/', $framework_host)) {
+    http_response_code(400);
+    exit("Invalid request host.");
+}
 
-define(
-    "URL_BASE",
-    (
-        (!empty($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off")
-            ? "https"
-            : "http"
-    ) . "://" . DOMAIN . "/"
-);
-
+define("DOMAIN", explode(":", $framework_host)[0]);
+define("URL_BASE", ($framework_https ? "https" : "http") . "://" . $framework_host . "/");
 define("URL_ROOT", __DIR__ . "/");
 define("URL_AUDIO", URL_BASE . "App/media/audio/");
 define("URL_IMAGES", URL_BASE . "App/media/images/");
@@ -40,9 +36,10 @@ define("PATH_CONFIG", PATH_ROOT . "config/");
 define("PATH_CORE", PATH_ROOT . "App/Backend/Core/");
 define("PATH_BACKEND", PATH_ROOT . "App/Backend/");
 
-if (!file_exists(PATH_ROOT . "App/Backend/Core/Initialize.php"))
+if (!is_readable(PATH_CORE . "Initialize.php"))
 {
+    http_response_code(500);
     exit("Could not load framework core, please check index.php file.");
 }
 
-require_once PATH_ROOT . "App/Backend/Core/Initialize.php";
+require_once PATH_CORE . "Initialize.php";
