@@ -11,5 +11,5 @@ if(deleteAccountPasswordInput.length&&deleteAccountButton.length){deleteAccountP
 deleteAccountForm.on("submit",function(event){if(deleteAccountPasswordInput.length){const passwordValue=deleteAccountPasswordInput.val();if(passwordValue.length<8){event.preventDefault();return;}}
 const confirmed=window.confirm("Are you absolutely sure you want to delete your account?\nThis action is permanent and cannot be undone.");if(!confirmed){event.preventDefault();}});}
 $(document).on("click","#clear-avatar-button",function(event){event.preventDefault();const confirmAvatarDeletion=window.confirm("Are you sure you want to delete your profile picture?");if(confirmAvatarDeletion){$("#clear-avatar-form").submit();}});
-/* Generated: 12.12.2025 20:45:48 */
+/* Generated: 8.9.2026 23:59:56 */
 //# sourceMappingURL=account.js.map

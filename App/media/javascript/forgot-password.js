@@ -4,5 +4,5 @@ button.prop("disabled",false);}
 function startCountDown(){const feedback=$("#forgot-password-feedback");const text=feedback.text();const match=text.match(/Please wait (\d+) seconds before trying again/);if(!match){return;}
 isCountingDown=true;$("#send-forgot-password-email-button").prop("disabled",true);let remaining=parseInt(match[1],10);const interval=setInterval(function(){remaining-=1;if(remaining<=0){clearInterval(interval);feedback.removeClass("failed success warning info");feedback.text("");isCountingDown=false;validateEmail();return;}
 feedback.text("Please wait "+remaining+" seconds before trying again");},1000);}
-/* Generated: 12.12.2025 20:45:48 */
+/* Generated: 8.9.2026 23:59:56 */
 //# sourceMappingURL=forgot-password.js.map

@@ -1,4 +1,4 @@
-<?php declare(strict_types=1); 
+<?php declare(strict_types=1);
 namespace Backend\Controllers;
 defined("ACCESS") or exit("Access Denied");
 
@@ -10,6 +10,51 @@ class RegistrationController
 {
     public function createUser(string $username, string $email, string $password, string $confirmPassword): void
     {
+        // Validate method
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Session::add("feedback_status", "failed");
+            Session::add("feedback_message", "Invalid registration request.");
+            return;
+        }
+
+        // Validate recaptcha token
+        if (empty($_POST['g-recaptcha-response'])) {
+            Session::add("feedback_status", "failed");
+            Session::add("feedback_message", "Please complete the reCAPTCHA verification.");
+            return;
+        }
+
+        $recaptchaToken = $_POST['g-recaptcha-response'];
+        $secretKey = RECAPTCHA_V2_SITE_SECRET;
+
+        // Prepare recaptcha request
+        $postData = [
+            'secret' => $secretKey,
+            'response' => $recaptchaToken,
+            'remoteip' => $_SERVER['REMOTE_ADDR']
+        ];
+
+        // Validate recaptcha with curl
+        $curl = curl_init();
+        curl_setopt_array($curl, [
+            CURLOPT_URL => "https://www.google.com/recaptcha/api/siteverify",
+            CURLOPT_POST => true,
+            CURLOPT_POSTFIELDS => $postData,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 10
+        ]);
+
+        $result = curl_exec($curl);
+        curl_close($curl);
+
+        $response = json_decode($result, true);
+
+        if (!$response || empty($response['success'])) {
+            Session::add("feedback_status", "failed");
+            Session::add("feedback_message", "reCAPTCHA verification failed. Please try again.");
+            return;
+        }
+
         $username = sanitize_file($username);
         $email = strtolower(trim($email));
 
@@ -101,14 +146,14 @@ class RegistrationController
 
         $usersDatabase = Users::getInstance();
         $verificationData = $usersDatabase->getVerificationData($email);
-    
+
         // No user found with email
         if (empty(get_object_vars($verificationData))) {
             Session::add("feedback_status", "failed");
             Session::add("feedback_message", "Invalid activation token.");
             return;
         }
-    
+
         // User already activated
         if ($verificationData->email_verified == 1) {
             Session::add("feedback_status", "success");
@@ -122,14 +167,14 @@ class RegistrationController
             Session::add("feedback_message", "Invalid activation token.");
             return;
         }
-    
+
         // Try activate user's account
         if (!$usersDatabase->activateUser($email)) {
             Session::add("feedback_status", "failed");
             Session::add("feedback_message", "Could not activate account. Please try again later.");
             return;
         }
-    
+
         Session::add("feedback_status", "success");
         Session::add("feedback_message", "Your account has been successfully activated! You may now sign in.");
     }
@@ -170,7 +215,7 @@ class RegistrationController
             Session::add("feedback_message", "Please wait {$cooldown} seconds before trying again.");
             return;
         }
-        
+
         // Generate a new verification token
         $tokenPlain = bin2hex(random_bytes(32));
         $tokenHash = hash("sha256", $tokenPlain);

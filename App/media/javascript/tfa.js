@@ -4,5 +4,5 @@ feedback.text("Please wait "+remaining+" seconds before trying again");},1000);}
 function validateTfaCode(){if(isCountingDown){return;}
 const code=$("#tfa-code").val().trim();const feedback=$("#tfa-feedback");const button=$("#tfa-button");feedback.removeClass("failed success warning info");feedback.text("");if(!/^\d{6}$/.test(code)){feedback.addClass("failed").text("Code must be a 6-digit number.");button.prop("disabled",true);return;}
 button.prop("disabled",false);}
-/* Generated: 12.12.2025 20:45:48 */
+/* Generated: 8.9.2026 23:59:56 */
 //# sourceMappingURL=tfa.js.map

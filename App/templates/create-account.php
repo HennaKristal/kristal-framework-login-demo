@@ -35,7 +35,7 @@
                     <img src="<?php echo webp("pictures/icon-cloud.webp"); ?>" class="signup-icon" alt="">
                     <span class="signup-feature-title">Automatic session handling and account lockout examples included.</span>
                 </div>
-                
+
                 <div class="signup-feature">
                     <img src="<?php echo webp("pictures/icon-unlimited.webp"); ?>" class="signup-icon" alt="">
                     <span class="signup-feature-title">Secure server communication with encrypted data in transit.</span>
@@ -84,13 +84,17 @@
                             <label class="form-check-label" for="terms-of-service-checkbox">I accept the</label>
                             <a class="popup-link" id="terms-of-service-link" popupID="terms-of-service-popup">Terms of Service</a>
                         </div>
-                        
+
+                        <div class="mb-3">
+                            <?php Block::render("recaptcha_v2"); ?>
+                        </div>
+
                         <div id="registration-feedback" class="feedback <?php echo $feedback_status; ?>">
                             <?php if(!empty($feedback_message)): ?>
                                     <?php echo $feedback_message; ?>
                             <?php endif; ?>
                         </div>
- 
+
                         <button type="submit" class="btn btn-success w-100 mb-3" id="registration-button" disabled>Create Account</button>
 
                         <p class="already-have-account-label text-center mb-0">Already have an account? <a href="<?php echo route("login"); ?>">Sign in</a></p>

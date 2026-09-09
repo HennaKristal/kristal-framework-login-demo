@@ -15,5 +15,5 @@ else{console.warn("Translator was not able to translate tooltip value: "+key);}}
 function kristal_reinitializeTooltip(element){const bsTooltip=bootstrap.Tooltip.getInstance(element);if(bsTooltip){bsTooltip.dispose();}
 new bootstrap.Tooltip(element);}
 $(document).ready(function(){const animatedElements=document.querySelectorAll(".animation-raise, .animation-fade, .animation-scale, .animation-move-left, .animation-move-right, .animation-move-up, .animation-move-down");const observer=new IntersectionObserver((entries)=>{entries.forEach(entry=>{if(entry.isIntersecting){requestAnimationFrame(()=>{entry.target.classList.add("animated");});}});},{threshold:0.25});animatedElements.forEach(element=>observer.observe(element));});
-/* Generated: 13.12.2025 18:41:37 */
+/* Generated: 8.9.2026 23:59:56 */
 //# sourceMappingURL=core.js.map

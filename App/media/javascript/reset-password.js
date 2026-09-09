@@ -3,5 +3,5 @@ if(new_password!==confirm_password){feedback.addClass("failed").text("Confirmati
 if(isWeakPassword(new_password)){feedback.addClass("warning").text("Your password is quite weak. We strongly recommend choosing a stronger one.");}
 button.prop("disabled",false);}
 function isWeakPassword(password){let score=0;if(password.length>=8)score++;if(password.length>=12)score++;if(password.length>=16)score++;if(/[a-z]/.test(password))score++;if(/[A-Z]/.test(password))score++;if(/\d/.test(password))score++;if(/[^A-Za-z0-9]/.test(password))score++;const uniqueCount=new Set(password).size;if(uniqueCount>=6)score++;if(uniqueCount>=10)score++;return score<5;}
-/* Generated: 12.12.2025 20:45:48 */
+/* Generated: 8.9.2026 23:59:56 */
 //# sourceMappingURL=reset-password.js.map
