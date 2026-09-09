@@ -3,3 +3,12 @@ config/config.php
 .vscode
 .vs
 .idea
+
+.htpasswd
+.htpasswd.*
+!.htpasswd.example
+
+/storage/logs/*
+!/storage/logs/.htaccess
+/storage/cache/*
+!/storage/cache/.htaccess

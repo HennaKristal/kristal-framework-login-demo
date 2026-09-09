@@ -48,13 +48,13 @@ define("ENABLE_DEBUG_LOG", true);
 // Defines the file path for logging debug and error messages (please keep this outside of html root)
 define("DEBUG_LOG_PATH", "./storage/logs/debug.log");
 
-// When enabled, PHP notices will not be displayed or logged
+// When enabled, PHP warnings will not be displayed or logged
 define("DEBUG_IGNORE_WARNINGS", false);
 
-// When enabled, PHP deprecated notices will not be displayed or logged
+// When enabled, PHP notices will not be displayed or logged
 define("DEBUG_IGNORE_NOTICES", false);
 
-// When enabled, PHP warnings will not be displayed or logged
+// When enabled, PHP deprecation messages will not be displayed or logged
 define("DEBUG_IGNORE_DEPRECATED", false);
 
 // When enabled, PHP strict standards notices will not be displayed or logged
@@ -110,11 +110,11 @@ define("MAILER_PASSWORD", "________");
 // Display name for outgoing emails
 define("MAILER_NAME", "________");
 
-// Common protocols include ssl. Leave blank if your email service lacks encryption
+// Use "ssl" with port 465 (implicit TLS), or "tls" with port 587 (STARTTLS)
 define("MAILER_PROTOCOL", "ssl");
 
-// Common email service ports include 25, 465, 587, and 2525
-define("MAILER_PORT", 25);
+// Match the port to the encryption mode and your provider
+define("MAILER_PORT", 465);
 
 
 
