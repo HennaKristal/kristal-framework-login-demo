@@ -2,7 +2,7 @@
     "name": "kristalframework/setup",
     "description": "Kristal Framework Setup",
     "type": "project",
-    "license": "GPL",
+    "license": "MIT",
     "authors": [
         {
             "name": "Henna Kristal Timonen",
@@ -15,8 +15,8 @@
     "require": {
         "php": "^8.3",
         "phpmailer/phpmailer": "7.0.1",
-        "tedivm/jshrink": "1.8.1",
-        "scssphp/scssphp": "1.13.0"
+        "scssphp/scssphp": "1.13.0",
+        "tedivm/jshrink": "1.8.1"
     },
 
     "autoload": {
