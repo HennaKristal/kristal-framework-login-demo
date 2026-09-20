@@ -23,11 +23,11 @@
         <title><?php echo translate("Maintenance"); ?></title>
 
         <!-- Website icon -->
-        <link rel="icon" type="image/gif" href="<?php echo webp("kristal_framework_alt_icon.png"); ?>" />
+        <link rel="icon" type="image/gif" href="<?php echo webp("kristal_framework_icon.png"); ?>" />
     </head>
 
     <body>
-        
+
         <!-- language settings -->
         <div id="language-selection">
             <?php Block::render("language_menu", ["request" => "change_language"]);  ?>
@@ -48,7 +48,7 @@
             <div class="container authentication-container">
                 <h2><?php echo translate("Authentication"); ?></h2>
                 <form method="post">
-                    
+
                     <div class="mb-3">
                         <input type="password" class="form-control" name="maintenance-password" id="maintenance-password" placeholder="Password" required>
                     </div>
@@ -67,7 +67,7 @@
                 </form>
             </div>
         <?php endif; ?>
-        
+
         <!-- Social links -->
         <div class="social-icons">
             <!-- Email -->

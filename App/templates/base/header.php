@@ -49,7 +49,7 @@
         <?php endif; ?>
 
         <!-- Website icon -->
-        <link rel="icon" type="image/gif" href="<?php echo webp("kristal_framework_alt_icon.png"); ?>" />
+        <link rel="icon" type="image/gif" href="<?php echo webp("kristal_framework_icon.png"); ?>" />
 
     </head>
 

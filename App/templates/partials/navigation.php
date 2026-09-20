@@ -1,12 +1,12 @@
 <nav class="navbar navbar-expand-lg border-bottom <?php echo $page === 'frontpage.php' ? 'transparent-at-top' : '' ?>" data-page="<?php echo $page ?>">
-    
+
     <div class="container">
 
         <!-- Navbar Title (text) -->
         <!-- <a class="navbar-brand" href="<?php echo route(""); ?>">Kristal Framework Login Demo</a> -->
 
         <!-- Navbar Title (image) -->
-        <a class="navbar-brand" href="<?php echo route(""); ?>"><img class="navbar-logo colorized" src="<?php echo webp("kristal_framework_alt_icon.png"); ?>" alt="Kristal login demo logo"/></a> 
+        <a class="navbar-brand" href="<?php echo route(""); ?>"><img class="navbar-logo colorized" src="<?php echo webp("kristal_framework_icon.png"); ?>" alt="Kristal login demo logo"/></a>
 
         <!-- Navbar mobile toggle button -->
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar-menu" aria-controls="navbar-menu" aria-expanded="false" aria-label="Toggle navigation" data-bs-theme="dark">
@@ -39,7 +39,7 @@
                                 <li><a class="dropdown-item text-danger" href="<?php echo route("logout"); ?>">Sign Out</a></li>
                             </ul>
                         </li>
-                        
+
                     <?php else: ?>
                         <li class="nav-item">
                             <a class="nav-link" page="login.php" href="<?php echo route("login"); ?>">Sign In</a>
