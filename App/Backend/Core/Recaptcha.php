@@ -36,7 +36,7 @@ class Recaptcha
 
     private static function verify(string $secretKey): array|false
     {
-        if (empty($_POST['g-recaptcha-response'])) {
+        if (!is_string($_POST['g-recaptcha-response'] ?? null) || $_POST['g-recaptcha-response'] === '') {
             return false;
         }
 

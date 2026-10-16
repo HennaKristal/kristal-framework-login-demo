@@ -19,6 +19,7 @@ class Mailer
         $this->mailer->SMTPSecure = MAILER_PROTOCOL;
         $this->mailer->Port = MAILER_PORT;
         $this->mailer->Host = MAILER_HOST;
+        $this->mailer->Timeout = 10;
         $this->mailer->Username = MAILER_EMAIL;
         $this->mailer->Password = MAILER_PASSWORD;
     }

@@ -18,8 +18,10 @@ class FormRequest
         if (!is_array($csrfData) || !is_string($csrfIdentifier) || !is_string($csrfToken))
             return;
 
-        $requestedMethod = $csrfData["formRequest"];
-        $expectedToken = $csrfData["token"];
+        $requestedMethod = $csrfData['formRequest'] ?? null;
+        $expectedToken = $csrfData['token'] ?? null;
+        if (!is_string($requestedMethod) || !is_string($expectedToken))
+            return;
 
         // Only handle real form submissions
         if ($_SERVER["REQUEST_METHOD"] !== "POST")
@@ -39,6 +41,8 @@ class FormRequest
 
         $allowProtectedCalls = ($parameters["allow_protected_calls"] ?? false) === true;
         $method = new ReflectionMethod($this, $requestedMethod);
+        if ($method->isConstructor() || $method->isDestructor() || $method->isStatic())
+            return;
         $isPublic = $method->isPublic();
         $isProtectedAndAllowed = $method->isProtected() && $allowProtectedCalls;
 

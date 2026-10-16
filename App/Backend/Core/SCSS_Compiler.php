@@ -9,14 +9,13 @@ use RecursiveIteratorIterator;
 final class SCSS_Compiler
 {
     private static string $compiledCssFolderPath= PATH_CSS;
-    private static string $globCompiledCssFolder = PATH_CSS . "*.css";
     private static string $globThemesFolder = PATH_CSS . "themes/*.scss";
     private static string $scssFolderPath = PATH_CSS . "scss/";
 
     public static function initialize(): void
     {
         $compiler = new Compiler();
-    
+
         // Select formatter
         $compiler->setOutputStyle(strtolower(COMPILED_CSS_TYPE) === "expanded" ? "expanded" : "compressed");
 
@@ -30,45 +29,35 @@ final class SCSS_Compiler
 
     private static function shouldCompile(): bool
     {
-        $latestCompiledTime = 0;
-        $compiledFiles = glob(self::$globCompiledCssFolder);
+        $themes = glob(self::$globThemesFolder);
+        $outputs = $themes === [] ? [self::$compiledCssFolderPath . ensureCSSExtension(DEFAULT_THEME)] : array_map(static fn(string $theme): string => self::$compiledCssFolderPath . ensureCSSExtension(strtolower(pathinfo($theme, PATHINFO_FILENAME))), $themes);
 
-        if (empty($compiledFiles))
-            return true;
-
-        // Determine time when CSS was last compiled
-        foreach ($compiledFiles as $file)
-        {
-            $time = filemtime($file);
-            if ($time > $latestCompiledTime)
-            {
-                $latestCompiledTime = $time;
-            }
-        }
+        foreach ($outputs as $output) { if (!is_file($output)) { return true; } }
+        $oldestCompiledTime = min(array_map('filemtime', $outputs));
 
         // Check if any theme file was modified after CSS compilation time
-        foreach (glob(self::$globThemesFolder) as $theme)
+        foreach ($themes as $theme)
         {
-            if (filemtime($theme) > $latestCompiledTime)
+            if (filemtime($theme) > $oldestCompiledTime)
             {
                 return true;
             }
         }
 
-        // Check recursively if any SCSS file is newer than the latest compiled CSS
+        // Check recursively if any SCSS file is newer than the oldest theme output.
         $directory = new RecursiveDirectoryIterator(self::$scssFolderPath);
         $iterator = new RecursiveIteratorIterator($directory);
         foreach ($iterator as $file)
         {
             if ($file->isFile() && strtolower($file->getExtension()) === 'scss')
             {
-                if ($file->getMTime() > $latestCompiledTime)
+                if ($file->getMTime() > $oldestCompiledTime)
                 {
                     return true;
                 }
             }
         }
-    
+
         return false;
     }
 
@@ -113,18 +102,18 @@ final class SCSS_Compiler
                 $scss .= file_get_contents($file->getRealPath());
             }
         }
-    
+
         // Compile sass files
         $compiledCss = $compiler->compileString($scss)->getCss();
-    
+
         // Add comment when file was last modified
         if (PRINT_COMPILE_DATE_CSS)
         {
             $compiledCss .= "\n/* Generated at: " . date(DATE_FORMAT . " " . TIME_FORMAT) . " */";
         }
-        
+
         $compiledCss .= "\n";
-    
+
         // Create css files from compiled sass
         file_put_contents(self::$compiledCssFolderPath. ensureCSSExtension($outputName), $compiledCss);
     }

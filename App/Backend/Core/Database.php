@@ -24,10 +24,11 @@ class Database
         try
         {
             $config = $databases[$params["database"]];
+            $address = empty($config['unix_socket']) ? 'host=' . $config['host'] . ';port=' . (int) ($config['port'] ?? 3306) : 'unix_socket=' . $config['unix_socket'];
 
             // Create connection
             $this->connection = new PDO(
-                "mysql:host={$config['host']};dbname={$config['database_name']};charset=utf8mb4",
+                "mysql:{$address};dbname={$config['database_name']};charset=utf8mb4",
                 $config['username'],
                 $config['password'],
                 [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_EMULATE_PREPARES => false]
