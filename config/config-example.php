@@ -355,4 +355,15 @@ define("METADATA", [
 # --------------------------------------------------------------------------
 
 // You can also define custom constants for use throughout the application
-define("CUSTOM_NAME", "CUSTOM_VALUE");
+define("ACTION_COOLDOWN", 30);
+define("ACTION_MAX_ATTEMPTS", 5);
+define("ACTION_LOCKED_OUT_COOLDOWN", 600);
+define("USERNAME_MIN_LENGTH", 3);
+define("USERNAME_MAX_LENGTH", 50);
+define("EMAIL_MAX_LENGTH", 150);
+define("PASSWORD_MIN_LENGTH", 8);
+define("TFA_EXPIRATION_TIME", 300);
+define("AVATAR_ALLOWED_EXTENSIONS", ["png", "jpg", "jpeg"]);
+
+// load this from .env variables!
+define("APP_CRYPTO_SECRET", "xxxxxxxxxxxxxxxxxxxxxxx");
