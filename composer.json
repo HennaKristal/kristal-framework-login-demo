@@ -13,9 +13,9 @@
     "prefer-stable": true,
 
     "require": {
-        "php": "^8.3",
-        "phpmailer/phpmailer": "7.0.1",
-        "scssphp/scssphp": "1.13.0",
+        "php": "^8.5",
+        "phpmailer/phpmailer": "7.1.1",
+        "scssphp/scssphp": "2.1.0",
         "tedivm/jshrink": "1.8.1"
     },
 
@@ -26,6 +26,9 @@
     },
     "config": {
         "optimize-autoloader": true,
+        "platform": {
+            "php": "8.5.0"
+        },
         "sort-packages": true
     }
 }

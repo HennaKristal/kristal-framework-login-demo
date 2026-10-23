@@ -3,6 +3,7 @@ namespace Backend\Core;
 defined("ACCESS") or exit("Access Denied");
 
 use ScssPhp\ScssPhp\Compiler;
+use ScssPhp\ScssPhp\OutputStyle;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 
@@ -17,7 +18,7 @@ final class SCSS_Compiler
         $compiler = new Compiler();
 
         // Select formatter
-        $compiler->setOutputStyle(strtolower(COMPILED_CSS_TYPE) === "expanded" ? "expanded" : "compressed");
+        $compiler->setOutputStyle( strtolower( COMPILED_CSS_TYPE ) === 'expanded' ? OutputStyle::EXPANDED : OutputStyle::COMPRESSED );
 
         // Check should we compile
         if (self::shouldCompile())
