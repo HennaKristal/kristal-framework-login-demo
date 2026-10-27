@@ -49,16 +49,20 @@ class SiteMapper
         $domElement = $dom->appendChild($domElement);
 
         // Save the formatted XML
-        $dom->save($this->sitemapPath);
+        $this->saveSitemap($dom);
     }
 
     private function synchronizeSitemap(): void
     {
         $updateAvailable = false;
+        $previousErrorHandling = libxml_use_internal_errors(true);
         $sitemap = simplexml_load_file($this->sitemapPath);
+        libxml_clear_errors();
+        libxml_use_internal_errors($previousErrorHandling);
+
         if ($sitemap === false)
         {
-            debuglog("Could not read sitemap XML: " . $this->sitemapPath, "warning");
+            $this->createSitemap();
             return;
         }
 
@@ -131,7 +135,36 @@ class SiteMapper
             $dom->preserveWhiteSpace = false;
             $dom->formatOutput = true;
             $dom->loadXML($sitemap->asXML());
-            $dom->save($this->sitemapPath);
+            $this->saveSitemap($dom);
+        }
+    }
+
+    private function saveSitemap(\DOMDocument $document): void
+    {
+        // Publish complete XML so concurrent requests cannot read a partial file.
+        $temporaryPath = $this->sitemapPath . "." . bin2hex(random_bytes(8)) . ".tmp";
+
+        try
+        {
+            if (@$document->save($temporaryPath) === false)
+            {
+                debuglog("Could not write sitemap XML: " . $this->sitemapPath, "warning");
+                return;
+            }
+
+            $permissions = is_file($this->sitemapPath) ? fileperms($this->sitemapPath) & 0777 : 0666 & ~umask();
+
+            if (!@chmod($temporaryPath, $permissions) || !@rename($temporaryPath, $this->sitemapPath))
+            {
+                debuglog("Could not publish sitemap XML: " . $this->sitemapPath, "warning");
+            }
+        }
+        finally
+        {
+            if (is_file($temporaryPath))
+            {
+                unlink($temporaryPath);
+            }
         }
     }
 }
