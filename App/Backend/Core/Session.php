@@ -113,21 +113,21 @@ class Session
         }
     }
 
-    public static function removeRememberCookie(): void
-    {
-        setcookie(
-            COOKIE_NAME,
-            "",
-            [
-                "expires" => time() - 3600,
-                "path" => "/",
-                "domain" => DOMAIN,
-                "secure" => true,
-                "httponly" => true,
-                "samesite" => "Strict"
-            ]
-        );
-    }
+	public static function removeRememberCookie(): void {
+		setcookie(
+			COOKIE_NAME,
+			'',
+			array(
+				'expires'  => time() - 3600,
+				'path'     => '/',
+				'domain'   => DOMAIN,
+				'secure'   => true,
+				'httponly' => true,
+				'samesite' => 'Strict',
+			)
+		);
+		unset( $_COOKIE[ COOKIE_NAME ] );
+	}
 
     private static function regenerateSessionIdPeriodically(): void
     {
@@ -149,31 +149,30 @@ class Session
         }
     }
 
-    public static function end(): void
-    {
-        Session::removeRememberCookie();
+	public static function end( bool $remove_remember_cookie = true ): void {
+		if ( $remove_remember_cookie ) {
+			self::removeRememberCookie();
+		}
 
-        // Remove all session variables
-        self::removeAll();
+		// Remove all session variables.
+		self::removeAll();
 
-        // Destroy session data on server
-        if (self::isActive())
-        {
-            $cookie = session_get_cookie_params();
-            unset($cookie["lifetime"]);
-            $cookie["expires"] = time() - 3600;
-            setcookie(session_name(), "", $cookie);
-            session_destroy();
-        }
-        unset($_COOKIE[session_name()]);
-        session_id("");
-    }
+		// Destroy session data on the server.
+		if ( self::isActive() ) {
+			$cookie = session_get_cookie_params();
+			unset( $cookie['lifetime'] );
+			$cookie['expires'] = time() - 3600;
+			setcookie( session_name(), '', $cookie );
+			session_destroy();
+		}
+		unset( $_COOKIE[ session_name() ] );
+		session_id( '' );
+	}
 
-    public static function restart(): void
-    {
-        self::end();
-        self::start();
-    }
+	public static function restart( bool $preserve_remember_cookie = false ): void {
+		self::end( ! $preserve_remember_cookie );
+		self::start();
+	}
 
     public static function regenerateId(): void
     {
@@ -260,7 +259,8 @@ class Session
         // Check has the user been afk longer than the allowed duration
         if (time() - (int)$timeout > $duration)
         {
-            self::restart();
+			// Allow remembered login to restore an expired session.
+			self::restart( preserve_remember_cookie: true );
         }
     }
 }

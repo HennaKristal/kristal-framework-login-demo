@@ -35,7 +35,6 @@ require_once PATH_CORE . "functions/sanitize.php";
 require_once PATH_CORE . "functions/escape.php";
 require_once PATH_CORE . "functions/errors.php";
 require_once PATH_CORE . "functions/debug.php";
-require_once PATH_CORE . "functions/cookies.php";
 
 // Initialize session
 class_alias("Backend\Core\Session", "Session");

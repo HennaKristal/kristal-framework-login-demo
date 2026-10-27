@@ -1,4 +1,4 @@
-<?php declare(strict_types=1); 
+<?php declare(strict_types=1);
 namespace Backend\Routes;
 defined("ACCESS") or exit("Access Denied");
 
@@ -40,11 +40,11 @@ class FormRequests extends FormRequest
     protected function update_profile(array $request): void
     {
         $avatar = isset($request["avatar"]) ? $request["avatar"] : null;
-    
+
         $newAvatarName = $avatar["name"] ?? null;
         $newAvatarTempName = $avatar["tmp_name"] ?? null;
         $newAvatarStatus = $avatar["error"] ?? null;
-    
+
         $accountController = new AccountController();
         $accountController->updateProfile(
             $request["username"],
@@ -88,7 +88,7 @@ class FormRequests extends FormRequest
             $request["delete-account-password"]
         );
     }
-    
+
 
     // ================ Registration ================
     public function registration(array $request): void
@@ -106,6 +106,8 @@ class FormRequests extends FormRequest
     // ================ Login ================
     public function login(array $request): void
     {
+        Session::add( 'stay_logged_in', ( $request['stay-logged-in'] ?? '' ) === 'on' );
+
         $loginController = new LoginController();
         $loginController->login(
             $request["login-email"],

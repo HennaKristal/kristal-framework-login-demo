@@ -1,4 +1,4 @@
-<?php declare(strict_types=1); 
+<?php declare(strict_types=1);
 namespace Backend\Controllers;
 defined("ACCESS") or exit("Access Denied");
 
@@ -43,7 +43,7 @@ class LoginController
             Session::add("feedback_message", "This account is not available, please try later.");
             return;
         }
-        
+
         // Check email verification
         if ($userData->email_verified == 0) {
             redirect("/activate-account/$email");
@@ -84,7 +84,7 @@ class LoginController
             Session::add("feedback_message", "Please wait {$cooldown} seconds before trying again.");
             return;
         }
-    
+
         $usersDatabase = Users::getInstance();
         $tfa_data = $usersDatabase->getTFAData($requested_tfa_email);
 
@@ -99,7 +99,7 @@ class LoginController
             Session::add("feedback_message", "No active verification code found.");
             return;
         }
-    
+
         // Check has TFA code expired
         if (time() > strtotime($tfa_data->tfa_expires)) {
             Session::add("feedback_status", "failed");
@@ -113,7 +113,7 @@ class LoginController
             Session::add("feedback_message", "Incorrect verification code.");
             return;
         }
-    
+
         // Success
         $usersDatabase->clearTFACode($requested_tfa_email);
         Session::remove("tfa_user_email");
@@ -129,7 +129,7 @@ class LoginController
         $usersDatabase->updateLastLogin($userData->id);
 
         Session::restart();
-   
+
         // Create session
         Session::add("logged_in", true);
         Session::add("account_id", $userData->id);
@@ -137,6 +137,38 @@ class LoginController
         Session::add("account_username", $userData->username);
         Session::add("account_avatar", $userData->avatar);
         Session::add("theme", $userData->theme);
+
+        if (Session::get("stay_logged_in", false))
+        {
+            $rawToken = bin2hex(random_bytes(32));
+            $tokenHash = hash("sha256", $rawToken);
+            $expires = date("Y-m-d H:i:s", time() + REMEMBER_ME_SESSION_LIFETIME);
+
+            UserRememberTokens::getInstance()->createToken(
+                (int)$userData->id,
+                $tokenHash,
+                $expires,
+                Session::getDeviceLabel(),
+                Session::getClientIPAddress()
+            );
+
+            setcookie(
+                COOKIE_NAME,
+                $rawToken,
+                [
+                    "expires" => time() + REMEMBER_ME_SESSION_LIFETIME,
+                    "path" => "/",
+                    'domain' => DOMAIN,
+                    "secure" => true,
+                    "httponly" => true,
+                    "samesite" => "Strict"
+                ]
+            );
+        }
+        else
+        {
+			Session::removeRememberCookie();
+        }
 
         redirect(route("account"));
     }

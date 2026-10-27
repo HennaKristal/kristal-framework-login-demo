@@ -1,9 +1,10 @@
-<?php declare(strict_types=1); 
+<?php declare(strict_types=1);
 namespace Backend\Controllers;
 defined("ACCESS") or exit("Access Denied");
 
 use Backend\Core\Session;
 use Backend\Database\Users;
+use Backend\Database\UserRememberTokens;
 use Backend\Controllers\PasswordHelper;
 
 class AccountController
@@ -81,7 +82,7 @@ class AccountController
                 Session::add("feedback_message", "Image extension not supported, please try another image.");
                 return;
             }
-        
+
             // Generate a safe random name for privacy
             $avatarFileName = bin2hex(random_bytes(16)) . Session::get("account_id") . "." . $extension;
 
@@ -96,12 +97,12 @@ class AccountController
             $previousAvatar = Session::get("account_avatar");
             if (!empty($previousAvatar)) {
                 $oldAvatarPath = imagePath("avatars/" . $previousAvatar);
-            
+
                 if (is_file($oldAvatarPath)) {
                     unlink($oldAvatarPath);
                 }
             }
-            
+
             Session::add("account_avatar", $avatarFileName);
         }
 
@@ -118,7 +119,7 @@ class AccountController
     {
         $usersDatabase = Users::getInstance();
         $currentAvatar = Session::get("account_avatar");
-        
+
         if (empty($currentAvatar)) {
 
             Session::add("feedback_status", "failed");
@@ -177,6 +178,8 @@ class AccountController
         $newpasswordHash = password_hash($newPassword, PASSWORD_ARGON2ID);
         $usersDatabase->updatePasswordHash(Session::get("account_id"), $newpasswordHash);
 
+        $this->rotateSessionsForCurrentUser();
+
         Session::add("feedback_status", "success");
         Session::add("feedback_message", "Your password has been successfully changed.");
     }
@@ -187,6 +190,8 @@ class AccountController
         $usersDatabase = Users::getInstance();
         $usersDatabase->enableTwoFactor(Session::get("account_id"));
 
+        $this->rotateSessionsForCurrentUser();
+
         Session::add("feedback_status", "success");
         Session::add("feedback_message", "Two factor authentication has been turned on.");
     }
@@ -196,6 +201,8 @@ class AccountController
     {
         $usersDatabase = Users::getInstance();
         $usersDatabase->disableTwoFactor(Session::get("account_id"));
+
+        $this->rotateSessionsForCurrentUser();
 
         Session::add("feedback_status", "success");
         Session::add("feedback_message", "Two factor authentication has been turned off.");
@@ -210,17 +217,17 @@ class AccountController
             Session::add("feedback_message", "You must enter your password to continue.");
             return;
         }
-    
+
         // Get stored password hash
         $usersDatabase = Users::getInstance();
         $passwordHash = $usersDatabase->getPasswordHash(Session::get("account_id"));
-    
+
         if ($passwordHash === null) {
             Session::add("feedback_status", "failed");
             Session::add("feedback_message", "Unable to verify your account credentials.");
             return;
         }
-    
+
         // Verify password
         if (!password_verify($password, $passwordHash)) {
             Session::add("feedback_status", "failed");
@@ -237,5 +244,39 @@ class AccountController
 
         Session::end();
         redirect(route(""));
+    }
+
+    public function validateSessionVersion(): void
+    {
+        $usersDatabase = Users::getInstance();
+
+        $accountId = (int) Session::get("account_id");
+        $sessionVersion = (int) Session::get("session_version");
+
+        $currentVersion = $usersDatabase->getSessionVersion($accountId);
+
+        if ($currentVersion === 0 || $currentVersion !== $sessionVersion)
+        {
+            // Remove remember tokens
+            UserRememberTokens::getInstance()->deleteTokensForUser($accountId);
+
+            Session::end();
+
+            redirect(route("login"));
+            exit();
+        }
+    }
+
+    private function rotateSessionsForCurrentUser(): void
+    {
+        $usersDatabase = Users::getInstance();
+        $accountId = (int) Session::get("account_id");
+
+        $usersDatabase->incrementSessionVersion($accountId);
+
+        $newVersion = $usersDatabase->getSessionVersion($accountId);
+        Session::add("session_version", $newVersion);
+
+        Session::regenerateId();
     }
 }
