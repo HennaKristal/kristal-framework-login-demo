@@ -42,7 +42,7 @@ RewriteRule . index.php [L,QSA]
 # Protect Sensitive Server Side Files #
 # =================================== #
 # Block dangerous and sensitive file extensions
-<FilesMatch "\.(env|ini|sql|db|sqlite|sqlite3|old|backup|bak|bk|tmp|swp|yml|svn|yaml|lock|log)$">
+<FilesMatch "(?i)\.(env|ini|sql|db|sqlite|sqlite3|old|backup|bak|bk|tmp|swp|yml|svn|yaml|lock|log)$">
     <IfModule mod_authz_core.c>
         Require all denied
     </IfModule>
@@ -78,19 +78,26 @@ RedirectMatch 404 ^/\.(agents|codex)(/|$)
 # Security HTTP Headers #
 # ===================== #
 <IfModule mod_headers.c>
+    # Prevent browsers from interpreting files as a different MIME type
     Header always set X-Content-Type-Options "nosniff"
+
+    # Share the full referrer URL internally, but only the origin with external HTTPS sites
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
+
+    # Disable browser access to geolocation, microphone, camera, and Payment Request API
     Header always set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+
+    # Disable outdated browser XSS filters that can introduce security vulnerabilities
     Header always set X-XSS-Protection "0"
 
-    # Enable HSTS when ready for permanent HTTPS usage
-    # Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains; preload"
+    # Require HTTPS connections for one year after the browser receives this header (disabled for local development)
+    # Header always set Strict-Transport-Security "max-age=31536000"
 
-    # Prevent your site from appearing inside iframes
-    # Header always set X-Frame-Options "SAMEORIGIN"
+    # Allow only pages from the same origin to embed this website in an iframe
+    Header always set X-Frame-Options "SAMEORIGIN"
 
-    # Restrict all resource loading to your own domain
-    # Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; object-src 'none';"
+    # Restrict iframe embedding and base URLs to the same origin, and block embedded objects
+    Header always set Content-Security-Policy "frame-ancestors 'self'; base-uri 'self'; object-src 'none'"
 </IfModule>
 
 
