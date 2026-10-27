@@ -1,4 +1,5 @@
-<?php namespace Backend\Database;
+<?php declare(strict_types=1);
+namespace Backend\Database;
 defined("ACCESS") or exit("Access Denied");
 
 use Backend\Core\Database;
@@ -34,6 +35,7 @@ class Users extends Database
             "tfa_expires" => "datetime",
             "password_reset_token" => "varchar(255)",
             "password_reset_expires" => "datetime",
+            "session_version" => "int(11) DEFAULT 1",
 
             // Metadata
             "avatar" => "varchar(100)",
@@ -64,12 +66,12 @@ class Users extends Database
     /*                           DATABASE API CALLS                           */
     /* ====================================================================== */
 
-    public function createUser($username, $email, $password_hash, $salt)
+    public function createUser($username, $email, $password_hash, $salt): void
     {
         $now = date("Y-m-d H:i:s");
         $token = bin2hex(random_bytes(32));
 
-        return $this->table()->insert([
+        $this->table()->insert([
             'username' => $username,
             'email' => $email,
             'password_hash' => $password_hash,
@@ -81,6 +83,7 @@ class Users extends Database
             'tfa_expires' => null,
             'password_reset_token' => null,
             'password_reset_expires' => null,
+            'session_version' => 1,
             'avatar' => '',
             'theme' => DEFAULT_THEME,
             'created_date' => $now,
@@ -90,7 +93,7 @@ class Users extends Database
         ]);
     }
 
-    public function doesEmailExist($email)
+    public function doesEmailExist($email): bool
     {
         $userRecord = $this->table()
             ->where("email", $email)
@@ -100,15 +103,23 @@ class Users extends Database
         return !empty(get_object_vars($userRecord));
     }
 
-    public function getPublicData($email)
+    public function getPublicData($email): object
     {
         return $this->table()
             ->where("email", $email)
-            ->select(["id", "created_date", "username", "email", "avatar", "email_verified", "two_factor_enabled", "account_status", "last_login", "theme"])
+            ->select(["id", "email", "created_date", "username", "email", "avatar", "email_verified", "two_factor_enabled", "account_status", "last_login", "theme", "session_version"])
             ->getFirst();
     }
 
-    public function getVerificationData($email)
+    public function getPublicDataById($id): object
+    {
+        return $this->table()
+            ->where("id", $id)
+            ->select(["id", "email", "created_date", "username", "email", "avatar", "email_verified", "two_factor_enabled", "account_status", "last_login", "theme", "session_version"])
+            ->getFirst();
+    }
+
+    public function getVerificationData($email): object
     {
         return $this->table()
             ->where("email", $email)
@@ -116,7 +127,7 @@ class Users extends Database
             ->getFirst();
     }
 
-    public function updateVerificationToken($email, $newToken)
+    public function updateVerificationToken($email, $newToken): void
     {
         $this->table()
             ->where("email", $email)
@@ -125,7 +136,7 @@ class Users extends Database
             ]);
     }
 
-    public function activateUser($email)
+    public function activateUser($email): bool
     {
         return $this->table()
             ->where("email", $email)
@@ -135,7 +146,7 @@ class Users extends Database
             ]);
     }
 
-    public function getResetPasswordData($email)
+    public function getResetPasswordData($email): object
     {
         return $this->table()
             ->where("email", $email)
@@ -143,7 +154,7 @@ class Users extends Database
             ->getFirst();
     }
 
-    public function updatePasswordResetToken($email, $token, $expires)
+    public function updatePasswordResetToken($email, $token, $expires): void
     {
         $this->table()
             ->where("email", $email)
@@ -153,7 +164,32 @@ class Users extends Database
             ]);
     }
 
-    public function setTFACode($email, $code, $expires)
+    public function getSessionVersion(int $userId): int
+    {
+        $data = $this->table()
+            ->where("id", $userId)
+            ->select(["session_version"])
+            ->getFirst();
+
+        if (isset($data->session_version))
+        {
+            return (int)$data->session_version;
+        }
+
+        return 0;
+    }
+
+    public function incrementSessionVersion(int $userId): void
+    {
+        $current = $this->getSessionVersion($userId);
+        $next = $current + 1;
+
+        $this->table()
+            ->where("id", $userId)
+            ->update(["session_version" => $next]);
+    }
+
+    public function setTFACode($email, $code, $expires): void
     {
         $this->table()
             ->where("email", $email)
@@ -162,8 +198,8 @@ class Users extends Database
                 "tfa_expires" => $expires,
             ]);
     }
-    
-    public function clearTFACode($email)
+
+    public function clearTFACode($email): void
     {
         $this->table()
             ->where("email", $email)
@@ -172,8 +208,8 @@ class Users extends Database
                 "tfa_expires" => null,
             ]);
     }
-    
-    public function getTFAData($email)
+
+    public function getTFAData($email): object
     {
         return $this->table()
             ->where("email", $email)
@@ -181,7 +217,7 @@ class Users extends Database
             ->getFirst();
     }
 
-    public function updateLastLogin($userId)
+    public function updateLastLogin($userId): void
     {
         $this->table()
             ->where("id", $userId)
@@ -190,7 +226,7 @@ class Users extends Database
             ]);
     }
 
-    public function updatePasswordHash($userId, $passwordHash)
+    public function updatePasswordHash($userId, $passwordHash): void
     {
         $this->table()
             ->where("id", $userId)
@@ -199,21 +235,22 @@ class Users extends Database
             ]);
     }
 
-    public function getPasswordHash($userId)
+    public function getPasswordHash($userId): ?string
     {
         $password_hash = $this->table()
             ->where("id", $userId)
             ->select(["password_hash"])
             ->getFirst();
 
-        if (isset($password_hash->password_hash)) {
+        if (isset($password_hash->password_hash))
+        {
             return $password_hash->password_hash;
         }
 
         return null;
     }
 
-    public function enableTwoFactor($userId)
+    public function enableTwoFactor($userId): void
     {
         $this->table()
             ->where("id", $userId)
@@ -222,7 +259,7 @@ class Users extends Database
             ]);
     }
 
-    public function disableTwoFactor($userId)
+    public function disableTwoFactor($userId): void
     {
         $this->table()
             ->where("id", $userId)
@@ -231,7 +268,7 @@ class Users extends Database
             ]);
     }
 
-    public function updateProfile($userId, $username = null, $avatarFileName = null)
+    public function updateProfile($userId, $username = null, $avatarFileName = null): void
     {
         $update = [];
 
@@ -248,7 +285,8 @@ class Users extends Database
         }
     }
 
-    public function updateTheme($userId, $newTheme) {
+    public function updateTheme($userId, $newTheme): void
+    {
         $this->table()
             ->where("id", $userId)
             ->update([
@@ -256,7 +294,8 @@ class Users extends Database
             ]);
     }
 
-    public function getTheme($userId) {
+    public function getTheme($userId): object
+    {
         $themeData = $this->table()
             ->where("id", $userId)
             ->select(["theme"])
@@ -269,7 +308,15 @@ class Users extends Database
         return DEFAULT_THEME;
     }
 
-    public function deleteUser($userId, $userEmail)
+    public function getUserEncryption($userId): object
+    {
+        return $this->table()
+            ->where("id", $userId)
+            ->select(["id", "encryption_salt", "encryption_key_version"])
+            ->getFirst();
+    }
+
+    public function deleteUser($userId, $userEmail): bool
     {
         return $this->table()
             ->where("id", $userId)->where("email", $userEmail)
@@ -299,6 +346,7 @@ class User extends Entity
         'tfa_expires' => 'datetime',
         'password_reset_token' => 'varchar(255)',
         'password_reset_expires' => 'datetime',
+        "session_version" => "int(11) DEFAULT 1",
         'avatar' => 'varchar(100)',
         'theme' => 'varchar(50)',
         'created_date' => 'datetime',
@@ -319,6 +367,7 @@ class User extends Entity
     public ?string $tfa_expires = null;
     public ?string $password_reset_token = null;
     public ?string $password_reset_expires = null;
+    public ?int $session_version = null;
     public ?string $avatar = null;
     public ?string $theme = null;
     public ?string $created_date = null;

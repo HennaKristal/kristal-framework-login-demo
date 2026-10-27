@@ -3,13 +3,114 @@ namespace Backend\Controllers;
 defined("ACCESS") or exit("Access Denied");
 
 use Backend\Database\Users;
+use Backend\Database\UserRememberTokens;
 use Backend\Core\Session;
 use Backend\Core\Mailer;
+use Backend\Core\Recaptcha;
 
 class LoginController
 {
+    public function tryAutoLogin(): void
+    {
+        if (Session::get("logged_in")) {
+            return;
+        }
+
+        if (Session::get("tfa_required")) {
+            return;
+        }
+
+        if (!isset($_COOKIE[COOKIE_NAME])) {
+            return;
+        }
+
+        $rawToken = $_COOKIE[COOKIE_NAME];
+        if (empty($rawToken)) {
+            return;
+        }
+
+        $tokenHash = hash("sha256", $rawToken);
+
+        $tokenRecord = UserRememberTokens::getInstance()->getValidToken($tokenHash);
+        if (empty(get_object_vars($tokenRecord))) {
+            Session::removeRememberCookie();
+            return;
+        }
+
+        $usersDatabase = Users::getInstance();
+        $userData = $usersDatabase->getPublicDataById((int)$tokenRecord->user_id);
+
+        if (empty(get_object_vars($userData))) {
+            UserRememberTokens::getInstance()->deleteTokenById((int)$tokenRecord->id);
+            Session::removeRememberCookie();
+            return;
+        }
+
+        if ($userData->account_status !== "active") {
+            UserRememberTokens::getInstance()->deleteTokenById((int)$tokenRecord->id);
+            Session::removeRememberCookie();
+            return;
+        }
+
+        if ((int)$userData->email_verified === 0) {
+            UserRememberTokens::getInstance()->deleteTokenById((int)$tokenRecord->id);
+            Session::removeRememberCookie();
+            return;
+        }
+
+        Session::regenerateId();
+
+        Session::add("logged_in", true);
+        Session::add("account_id", (int)$userData->id);
+        Session::add("account_email", $userData->email);
+        Session::add("account_username", $userData->username);
+        Session::add("account_avatar", $userData->avatar);
+        Session::add("theme", $userData->theme);
+        Session::add("session_version", (int)$userData->session_version);
+
+        $this->rotateRememberToken((int)$tokenRecord->id);
+
+        Users::getInstance()->updateLastLogin((int)$userData->id);
+    }
+
+    private function rotateRememberToken(int $tokenId): void
+    {
+        if (!isset($_COOKIE[COOKIE_NAME]))
+            return;
+
+        $rawToken = bin2hex(random_bytes(32));
+        $tokenHash = hash("sha256", $rawToken);
+        $expires = date("Y-m-d H:i:s", time() + REMEMBER_ME_SESSION_LIFETIME);
+
+        UserRememberTokens::getInstance()->updateTokenUsage(
+            $tokenId,
+            $tokenHash,
+            $expires
+        );
+
+        setcookie(
+            COOKIE_NAME,
+            $rawToken,
+            [
+                "expires" => time() + REMEMBER_ME_SESSION_LIFETIME,
+                "path" => "/",
+                "domain" => DOMAIN,
+                "secure" => true,
+                "httponly" => true,
+                "samesite" => "Strict"
+            ]
+        );
+    }
+
     public function login(string $email, string $password): void
     {
+        // Validate recaptcha
+        if (!Recaptcha::validateV2()) {
+            Session::add("feedback_status", "failed");
+            Session::add("feedback_message", "reCAPTCHA verification failed. Please try again.");
+            return;
+        }
+
         $email = strtolower(trim($email));
 
         // Check valid email
@@ -52,6 +153,7 @@ class LoginController
 
         // Handle two factor authentication initialization
         if ($userData->two_factor_enabled) {
+            Session::regenerateId();
             Session::add("tfa_user_email", $email);
             Session::add("tfa_required", true);
 
@@ -128,15 +230,16 @@ class LoginController
         $userData = $usersDatabase->getPublicData($email);
         $usersDatabase->updateLastLogin($userData->id);
 
-        Session::restart();
+        Session::regenerateId();
 
         // Create session
         Session::add("logged_in", true);
-        Session::add("account_id", $userData->id);
+        Session::add("account_id", (int)$userData->id);
         Session::add("account_email", $userData->email);
         Session::add("account_username", $userData->username);
         Session::add("account_avatar", $userData->avatar);
         Session::add("theme", $userData->theme);
+        Session::add("session_version", (int)$userData->session_version);
 
         if (Session::get("stay_logged_in", false))
         {
@@ -201,8 +304,8 @@ class LoginController
 
     private function sendTFAEmail(string $email): void
     {
-        $codePlain = random_int(100000, 999999);
-        $codeHash = hash('sha256', (string) $codePlain);
+        $codePlain = PasswordHelper::generateTFAToken();
+        $codeHash = hash('sha256', $codePlain);
         $expires = date("Y-m-d H:i:s", time() + TFA_EXPIRATION_TIME);
         $usersDatabase = Users::getInstance();
         $usersDatabase->setTFACode($email, $codeHash, $expires);
@@ -223,6 +326,13 @@ class LoginController
     /* --------------------------- Password Reset --------------------------- */
     public function forgotPassword(string $email): void
     {
+        // Validate recaptcha
+        if (!Recaptcha::validateV2()) {
+            Session::add("feedback_status", "failed");
+            Session::add("feedback_message", "reCAPTCHA verification failed. Please try again.");
+            return;
+        }
+
         // Limit the rate user can request password reset
         $cooldown = ActionRateLimiter::GetActionCooldown();
         if ($cooldown > 0) {
@@ -367,6 +477,9 @@ class LoginController
         $newHash = password_hash($newPassword, PASSWORD_ARGON2ID);
         $usersDatabase->updatePasswordResetToken($email, null, null);
         $usersDatabase->updatePasswordHash($resetData->id, $newHash);
+        $usersDatabase->incrementSessionVersion((int)$resetData->id);
+        $usersDatabase->clearTFACode($email);
+
 
         Session::add("feedback_status", "success");
         Session::add("feedback_message", "Your password has been reset. You may now log in.");

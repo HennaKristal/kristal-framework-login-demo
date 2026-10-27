@@ -7,4 +7,3 @@
 <p><a href="{{ url }}two-factor-authentication/{{ tfa_token }}" style="display:inline-block;padding:12px 20px;background:#007bff;color:#ffffff; text-decoration:none;border-radius:4px;font-weight:bold;">Verify Login Automatically</a></p>
 
 <p>This code expires in 5 minutes.</p>
-

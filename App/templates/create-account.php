@@ -7,43 +7,43 @@
         <!-- Left Column -->
         <div class="col-xl-6 col-lg-12 mb-5 signup-marketing-container">
 
-            <h1 class="signup-title">Create Your Free Account</h1>
-            <p class="signup-subtitle">Sign in, authenticate, and manage your session securely using a modern login framework example.</p>
+            <h1 class="signup-title">Create your free account</h1>
+            <p class="signup-subtitle">Secure your passwords and manage all your logins safely in one place.</p>
 
             <div class="signup-features">
                 <div class="signup-feature">
                     <img src="<?php echo webp("pictures/icon-encryption.webp"); ?>" class="signup-icon" alt="">
-                    <span class="signup-feature-title">Highest quality security practices</span>
+                    <span class="signup-feature-title">Highest quality encryption</span>
                 </div>
 
                 <div class="signup-feature">
                     <img src="<?php echo webp("pictures/icon-passwords.webp"); ?>" class="signup-icon" alt="">
-                    <span class="signup-feature-title">Secure credential handling using modern authentication patterns.</span>
+                    <span class="signup-feature-title">Generate strong, unique passwords instantly.</span>
                 </div>
 
                 <div class="signup-feature">
                     <img src="<?php echo webp("pictures/icon-protected.webp"); ?>" class="signup-icon" alt="">
-                    <span class="signup-feature-title">Your data is processed securely and never exposed unnecessarily.</span>
+                    <span class="signup-feature-title">Your data stays private, even from us.</span>
                 </div>
 
                 <div class="signup-feature">
                     <img src="<?php echo webp("pictures/icon-authentication.webp"); ?>" class="signup-icon" alt="">
-                    <span class="signup-feature-title">Optional two-factor authentication flow for enhanced protection.</span>
+                    <span class="signup-feature-title">Two-factor authentication for enhanced protection.</span>
                 </div>
 
                 <div class="signup-feature">
                     <img src="<?php echo webp("pictures/icon-cloud.webp"); ?>" class="signup-icon" alt="">
-                    <span class="signup-feature-title">Automatic session handling and account lockout examples included.</span>
+                    <span class="signup-feature-title">Secure cloud sync across all your devices.</span>
                 </div>
 
                 <div class="signup-feature">
                     <img src="<?php echo webp("pictures/icon-unlimited.webp"); ?>" class="signup-icon" alt="">
-                    <span class="signup-feature-title">Secure server communication with encrypted data in transit.</span>
+                    <span class="signup-feature-title">Unlimited secure entries for your passwords.</span>
                 </div>
 
                 <div class="signup-feature">
                     <img src="<?php echo webp("pictures/icon-free.webp"); ?>" class="signup-icon" alt="">
-                    <span class="signup-feature-title">Clean, extensible structure for adding users and roles.</span>
+                    <span class="signup-feature-title">Free to use, no subscriptions or hidden fees.</span>
                 </div>
             </div>
         </div>
@@ -122,6 +122,7 @@
             </div>
         </div>
     </div>
+
 
 </div>
 

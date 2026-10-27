@@ -20,12 +20,15 @@
     <!-- Profile Section -->
     <section class="settings-section">
 
-        <h2 class="settings-heading">Profile</h2>
+        <h2 class="settings-heading">Perzonalization</h2>
         <p class="settings-description">Update your username and avatar.</p>
 
         <div class="card form-card settings-card">
             <div class="card-body">
-                <form method="post" autocomplete="off" spellcheck="false" enctype="multipart/form-data">>
+
+                <h3 class="settings-subheading">Update Profile</h3>
+
+                <form method="post" autocomplete="off" spellcheck="false" enctype="multipart/form-data">
 
                     <?php CSRF::create("update_profile", "update_profile"); ?>
 
@@ -33,8 +36,6 @@
                         <label class="form-label">Username</label>
                         <input type="text" class="form-control" name="username" id="username" value="<?php echo $user->username; ?>" required minlength="3">
                     </div>
-
-                    <div class="feedback" id="username-feedback"></div>
 
                     <div class="form-group mb-3 avatar-row">
                         <label class="form-label">Avatar</label>
@@ -47,6 +48,8 @@
                             <?php endif; ?>
                         </div>
                     </div>
+
+                    <div class="feedback" id="username-feedback"></div>
 
                     <button type="submit" id="update-profile-button" class="btn btn-primary">Save Changes</button>
                 </form>

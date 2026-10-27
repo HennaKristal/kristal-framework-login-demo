@@ -279,4 +279,5 @@ class AccountController
 
         Session::regenerateId();
     }
+
 }

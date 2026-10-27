@@ -3,8 +3,10 @@ namespace Backend\Controllers;
 defined("ACCESS") or exit("Access Denied");
 
 use Backend\Database\Users;
+use Backend\Database\Preferences;
 use Backend\Core\Session;
 use Backend\Core\Mailer;
+use Backend\Core\Recaptcha;
 
 class RegistrationController
 {
@@ -17,39 +19,8 @@ class RegistrationController
             return;
         }
 
-        // Validate recaptcha token
-        if (empty($_POST['g-recaptcha-response'])) {
-            Session::add("feedback_status", "failed");
-            Session::add("feedback_message", "Please complete the reCAPTCHA verification.");
-            return;
-        }
-
-        $recaptchaToken = $_POST['g-recaptcha-response'];
-        $secretKey = RECAPTCHA_V2_SITE_SECRET;
-
-        // Prepare recaptcha request
-        $postData = [
-            'secret' => $secretKey,
-            'response' => $recaptchaToken,
-            'remoteip' => $_SERVER['REMOTE_ADDR']
-        ];
-
-        // Validate recaptcha with curl
-        $curl = curl_init();
-        curl_setopt_array($curl, [
-            CURLOPT_URL => "https://www.google.com/recaptcha/api/siteverify",
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => $postData,
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_TIMEOUT => 10
-        ]);
-
-        $result = curl_exec($curl);
-        curl_close($curl);
-
-        $response = json_decode($result, true);
-
-        if (!$response || empty($response['success'])) {
+        // Validate recaptcha
+        if (!Recaptcha::validateV2()) {
             Session::add("feedback_status", "failed");
             Session::add("feedback_message", "reCAPTCHA verification failed. Please try again.");
             return;
@@ -102,6 +73,7 @@ class RegistrationController
 
         // Password validation
         $passwordValidation = PasswordHelper::validate($password);
+
         if ($passwordValidation !== true) {
             Session::add("feedback_status", "failed");
             Session::add("feedback_message", $passwordValidation);
@@ -120,9 +92,12 @@ class RegistrationController
         // Create user
         $passwordHash = password_hash($password, PASSWORD_ARGON2ID);
         $encryptionSalt = bin2hex(random_bytes(32));
-        $newUser = $usersDatabase->createUser($username, $email, $passwordHash, $encryptionSalt);
 
-        if (!$newUser) {
+        $usersDatabase->createUser($username, $email, $passwordHash, $encryptionSalt);
+
+        $createdUser = $usersDatabase->getPublicData($email);
+
+        if (empty(get_object_vars($createdUser))) {
             Session::add("feedback_status", "failed");
             Session::add("feedback_message", "Unable to create account. Please try again.");
             return;

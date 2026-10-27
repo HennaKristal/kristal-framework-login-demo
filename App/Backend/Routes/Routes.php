@@ -1,4 +1,4 @@
-<?php declare(strict_types=1); 
+<?php declare(strict_types=1);
 namespace Backend\Routes;
 defined("ACCESS") or exit("Access Denied");
 
@@ -12,14 +12,20 @@ class Routes extends Router
 {
     public function __construct()
     {
+        $this->checkAuthentication();
+
         parent::setHomepageHandler("homepageHandler");
         parent::setDefaultHandler("homepageHandler");
 
         // Set routes
         if (Session::get("logged_in"))
         {
+            $accountController = new AccountController();
+            $accountController->validateSessionVersion();
+
             parent::addRoute("account", "accountHandler");
             parent::addRoute("logout", "logoutHandler");
+
         }
         else
         {
@@ -30,18 +36,37 @@ class Routes extends Router
             parent::addRoute("forgot-password", "forgotPasswordHandler");
             parent::addRoute("reset-password", "passwordResetHandler");
         }
-        
+
         // Let router handle the routes
         parent::handleRoutes();
-        
+
         Session::remove("feedback_status");
         Session::remove("feedback_message");
+    }
+
+
+    private function checkAuthentication(): void
+    {
+        $loginController = new LoginController();
+        $loginController->tryAutoLogin();
     }
 
 
     // ============ Content pages ============
     public function homepageHandler(): void
     {
+        if (Session::get("logged_in"))
+        {
+            $accountController = new AccountController();
+            $userData = $accountController->getCurrentUser();
+
+            $this->render("frontpage", [
+                "user" => $userData,
+            ]);
+
+            return;
+        }
+
         $this->render("frontpage");
     }
 
@@ -49,7 +74,7 @@ class Routes extends Router
     {
         $accountController = new AccountController();
         $userData = $accountController->getCurrentUser();
-        
+
         $this->render("account", [
             "user" => $userData,
             "feedback_status" => Session::get("feedback_status"),
@@ -88,7 +113,7 @@ class Routes extends Router
     {
         $loginController = new LoginController();
         $loginController->checkPasswordResetValues($email, $token);
-    
+
         $this->render("reset-password", [
             "email" => $email,
             "token" => $token,

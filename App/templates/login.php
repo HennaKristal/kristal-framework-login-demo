@@ -21,7 +21,7 @@
                         <div class="form-group mb-3">
                             <label for="login-password" class="form-label">Password</label>
                             <input type="password" class="form-control" id="login-password" name="login-password" required>
-                            <div class="text-end mt-1">
+                            <div class="text-end mt-1 forgot-password-container">
                                 <a href="<?php echo route("forgot-password"); ?>">Forgot password?</a>
                             </div>
                         </div>
@@ -31,12 +31,21 @@
                             <label class="form-check-label" for="login-remember-email">Remember email</label>
                         </div>
 
+                        <div class="form-check mb-3">
+                            <input type="checkbox" class="form-check-input" id="stay-logged-in" name="stay-logged-in">
+                            <label class="form-check-label" for="stay-logged-in">Stay Logged In</label>
+                        </div>
+
+                        <div class="mb-3">
+                            <?php Block::render("recaptcha_v2"); ?>
+                        </div>
+
                         <?php if (!empty($feedback_message)) : ?>
                             <div class="feedback <?php echo $feedback_status; ?>">
                                 <?php echo $feedback_message; ?>
                             </div>
                         <?php endif;?>
-                 
+
                         <button type="submit" class="btn btn-primary w-100" id="login-button">Login</button>
                     </form>
 

@@ -106,7 +106,7 @@ class FormRequests extends FormRequest
     // ================ Login ================
     public function login(array $request): void
     {
-        Session::add( 'stay_logged_in', ( $request['stay-logged-in'] ?? '' ) === 'on' );
+		Session::add( 'stay_logged_in', ( $request['stay-logged-in'] ?? '' ) === 'on' );
 
         $loginController = new LoginController();
         $loginController->login(

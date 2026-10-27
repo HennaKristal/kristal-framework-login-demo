@@ -8,14 +8,14 @@
                 <div class="card-body">
 
                     <h1 class="tfa-title">Verify Your Login</h1>
-                    <p class="tfa-description">We've sent a 6-digit verification code to your email.</p>
+                    <p class="tfa-description">We've sent a verification code to your email.</p>
 
                     <form method="post" autocomplete="off" spellcheck="false">
                         <?php CSRF::create("two_factor_authentication", "two_factor_authentication"); ?>
 
                         <div class="form-group mb-3">
                             <label class="form-label" for="tfa-code">Enter Verification Code</label>
-                            <input type="number" class="form-control" name="tfa-code" id="tfa-code" required minlength="6" maxlength="6" value="<?php echo esc_html($tfa_code) ?>">
+                            <input type="text" class="form-control" name="tfa-code" id="tfa-code" required minlength="8" maxlength="8" value="<?php echo esc_html($tfa_code) ?>">
                         </div>
 
                         <div class="feedback <?php echo $feedback_status; ?>" id="tfa-feedback">
@@ -43,7 +43,7 @@
 // Delete if URL code is removed
 document.addEventListener("DOMContentLoaded", function () {
     const code = "<?php echo $tfa_code ?>";
-    if (code.length === 6) {
+    if (code.length === 8) {
         $("#tfa-code").val(code);
         $("#tfa-button").prop("disabled", false);
     }

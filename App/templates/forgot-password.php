@@ -18,12 +18,16 @@
                             <input type="email" class="form-control" name="forgot-password-email" id="forgot-password-email" required minlength="4">
                         </div>
 
+                        <div class="mb-3">
+                            <?php Block::render("recaptcha_v2"); ?>
+                        </div>
+
                         <div class="feedback <?php echo $feedback_status; ?>" id="forgot-password-feedback">
                             <?php if (!empty($feedback_message)): ?>
                                 <?php echo $feedback_message; ?>
                             <?php endif; ?>
                         </div>
-             
+
                         <button type="submit" class="btn btn-success" id="send-forgot-password-email-button">Send Reset Link</button>
                     </form>
 

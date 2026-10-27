@@ -50,8 +50,10 @@ function validateTfaCode() {
     feedback.removeClass("failed success warning info");
     feedback.text("");
 
-    if (!/^\d{6}$/.test(code)) {
-        feedback.addClass("failed").text("Code must be a 6-digit number.");
+    if (!/^[A-Z0-9]{8}$/.test(code)) {
+        feedback
+            .addClass("failed")
+            .text("Code must be 8 characters using capital letters and numbers.");
         button.prop("disabled", true);
         return;
     }

@@ -26,8 +26,7 @@
                         <p class="reset-description">Set a secure new password for your account.</p>
 
                         <form method="post" autocomplete="off" spellcheck="false">
-                            <?php CSRF::create("password_reset"); ?>
-                            <?php CSRF::request("password_reset"); ?>
+                            <?php CSRF::create("password_reset", "password_reset"); ?>
 
                             <input type="hidden" name="email" value="<?php echo $email; ?>">
                             <input type="hidden" name="token" value="<?php echo $token; ?>">

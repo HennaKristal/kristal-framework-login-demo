@@ -34,10 +34,7 @@
         <!-- Scripts -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
         <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
-        <script src="<?php echo js("Core/animator.js.js"); ?>"></script>
-        <script src="<?php echo js("Core/form.js"); ?>"></script>
-        <script src="<?php echo js("Core/tooltips.js.js"); ?>"></script>
-        <script src="<?php echo js("Core/translator.js"); ?>"></script>
+        <script src="<?php echo js("core.js"); ?>"></script>
 
         <!-- Page title -->
         <?php if (!empty($kristal_metadata[$page]["title"])): ?>
