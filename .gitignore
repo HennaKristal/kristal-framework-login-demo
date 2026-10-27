@@ -12,3 +12,5 @@ config/config.php
 !/storage/logs/.htaccess
 /storage/cache/*
 !/storage/cache/.htaccess
+/storage/webp/*
+!/storage/webp/.htaccess
