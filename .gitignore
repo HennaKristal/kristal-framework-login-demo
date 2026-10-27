@@ -8,6 +8,9 @@ config/config.php
 .htpasswd.*
 !.htpasswd.example
 
+/App/media/images/avatars/*
+!/App/media/images/avatars/.htaccess
+
 /storage/logs/*
 !/storage/logs/.htaccess
 /storage/cache/*

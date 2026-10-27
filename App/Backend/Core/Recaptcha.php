@@ -58,8 +58,6 @@ class Recaptcha
 
         $result = curl_exec($curl);
 
-        curl_close($curl);
-
         if ($result === false) {
             return false;
         }
