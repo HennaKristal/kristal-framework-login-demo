@@ -53,8 +53,8 @@ class UserRememberTokens extends Database
         int $userId,
         string $tokenHash,
         string $expiresAt,
-        string $deviceLabel = null,
-        string $ipAddress = null
+        ?string $deviceLabel = null,
+        ?string $ipAddress = null
     ): void
     {
         $this->table()->insert([
